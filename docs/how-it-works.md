@@ -29,6 +29,7 @@ Not every atom applies to every piece of code. The distinction matters for both 
 **Always apply:**
 - **clean-code** -- Every piece of code benefits from SRP, clear naming, managed complexity, and proper error handling.
 - **clean-architecture** -- Every file lives in a layer, and every dependency has a direction. Structural rules apply universally.
+- **knowledge-priming** -- Project context (tech stack, architecture, conventions) is always relevant. Without it, the AI defaults to generic assumptions.
 
 **Conditionally apply:**
 - **domain-driven-design** -- Only when touching domain layer code. A controller or infrastructure adapter does not need aggregate boundary checks.
@@ -37,8 +38,9 @@ Not every atom applies to every piece of code. The distinction matters for both 
 
 ### The special ones
 
-Two atoms serve different purposes than the code-quality atoms:
+Three atoms serve different purposes than the code-quality atoms:
 
+- **knowledge-priming** is a context atom. It loads the project's identity -- tech stack, architecture overview, directory layout, trusted sources, and conventions -- so that all other skills operate with awareness of what the project actually is. Without it, the AI defaults to "the average of the internet." Unlike quality atoms, it has no embedded defaults -- every project's identity is unique. The knowledge base document is created by the `knowledge-priming-refiner` or written by hand.
 - **design-first** is a methodology atom, not a code quality atom. It guides structured thinking through 5 progressive levels (Capabilities → Components → Interactions → Contracts → Implementation) before any code is written. It prevents the AI from jumping straight to implementation.
 - **context-anchoring** is a persistence mechanism. It manages per-feature living documents that capture decisions, constraints, and reasoning across sessions. It solves the problem of AI context decay -- by message 30+, early decisions get contradicted unless they are written down.
 
@@ -65,7 +67,7 @@ Molecules are orchestrated multi-step workflows. Each molecule composes multiple
 
 A complete design workflow that produces an approved blueprint before any code is written.
 
-**Composes**: context-anchoring, design-first, clean-architecture, domain-driven-design
+**Composes**: knowledge-priming, context-anchoring, design-first, clean-architecture, domain-driven-design
 
 **How it works**:
 1. **Establish context**: Uses context-anchoring to create or load the feature's living document.
@@ -79,7 +81,7 @@ The blueprint stops at Level 4 (Contracts). It does not proceed to Level 5 (Impl
 
 Generates implementation from an approved blueprint or verbal requirements.
 
-**Composes**: context-anchoring (always), clean-architecture (always), clean-code (always), domain-driven-design (conditional: domain layer), secure-coding (conditional: trust boundaries), test-quality (always when writing tests)
+**Composes**: knowledge-priming (always), context-anchoring (always), clean-architecture (always), clean-code (always), domain-driven-design (conditional: domain layer), secure-coding (conditional: trust boundaries), test-quality (always when writing tests)
 
 **How it works**:
 1. **Load context**: Uses context-anchoring to find and load the feature's blueprint. If none exists, works from verbal requirements -- all atom guardrails still apply.
@@ -94,7 +96,7 @@ The user chooses a review mode: layer-by-layer (recommended), full autonomy, or 
 
 A structured, delta-scoped code review that loads atoms conditionally based on what changed.
 
-**Composes**: clean-code (always), clean-architecture (conditional), domain-driven-design (conditional), secure-coding (conditional), test-quality (conditional)
+**Composes**: knowledge-priming (always), clean-code (always), clean-architecture (conditional), domain-driven-design (conditional), secure-coding (conditional), test-quality (conditional)
 
 **How it works**:
 1. **Identify the delta**: Determines the set of changed files (PR, commit, or specified files).
@@ -144,9 +146,9 @@ Re-run a refiner or edit the standards document whenever your standards evolve.
 | **architecture-refiner** | `.ai/standards/clean-architecture.md` | clean-architecture | Layer definitions, dependency rules, command/query flow patterns, service patterns |
 | **ddd-refiner** | `.ai/standards/ddd-principles.md` | domain-driven-design | Aggregate design rules, entity/value object patterns, domain event conventions, repository patterns |
 | **clean-code-refiner** | `.ai/standards/clean-code.md` | clean-code | Function size thresholds, complexity limits, naming conventions, error handling strategy |
-| **knowledge-priming-refiner** | `.ai/standards/knowledge-base.md` | (ambient context) | Architecture overview, tech stack with versions, trusted doc sources, project structure, conventions |
+| **knowledge-priming-refiner** | `.ai/standards/knowledge-base.md` | knowledge-priming | Architecture overview, tech stack with versions, trusted doc sources, project structure, conventions |
 
-The knowledge-priming-refiner is different from the others -- its output is not consumed by a specific atom but serves as ambient project context for all skills.
+The knowledge-priming-refiner completes the pattern -- like the other refiners, its output is consumed by a matching atom (knowledge-priming) through config resolution. The knowledge-priming atom loads the document and makes it available as ambient project context for all skills and molecules.
 
 ## The Design-to-Code Pipeline
 

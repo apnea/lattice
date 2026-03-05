@@ -9,11 +9,12 @@ description: "Perform a structured code review by composing validation checklist
 
 Load and apply these skills based on the scope of the review (see Step 2 for conditional loading):
 
-1. `framework:clean-code` -- Code craft validation: SRP, naming, complexity, error handling (always loaded)
-2. `framework:clean-architecture` -- Structural validation: layer rules, dependency direction, command/query flows (conditional)
-3. `framework:domain-driven-design` -- Domain modeling validation: aggregates, entities, value objects (conditional)
-4. `framework:secure-coding` -- Security validation: trust boundaries, injection, secrets, input handling (conditional)
-5. `framework:test-quality` -- Test validation: AAA structure, isolation, assertions, naming (conditional)
+1. `framework:knowledge-priming` -- Load project context (tech stack, architecture, conventions) to evaluate changes against real project standards (always loaded)
+2. `framework:clean-code` -- Code craft validation: SRP, naming, complexity, error handling (always loaded)
+3. `framework:clean-architecture` -- Structural validation: layer rules, dependency direction, command/query flows (conditional)
+4. `framework:domain-driven-design` -- Domain modeling validation: aggregates, entities, value objects (conditional)
+5. `framework:secure-coding` -- Security validation: trust boundaries, injection, secrets, input handling (conditional)
+6. `framework:test-quality` -- Test validation: AAA structure, isolation, assertions, naming (conditional)
 
 ## Workflow
 

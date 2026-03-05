@@ -9,12 +9,13 @@ description: "Generate implementation code from an approved design blueprint or 
 
 Read and apply these skills:
 
-1. `framework:context-anchoring` -- Load or discover an existing context anchor document; enrich it as implementation decisions are made (always)
-2. `framework:clean-architecture` -- Layer placement, dependency direction, command/query flow classification (always)
-3. `framework:clean-code` -- Code craft guardrails: SRP, naming, complexity, error handling (always)
-4. `framework:domain-driven-design` -- Aggregates, entities, value objects, domain services (conditional: only when touching domain folder)
-5. `framework:secure-coding` -- Trust boundaries, injection prevention, secrets management (conditional: only for boundary-crossing code)
-6. `framework:test-quality` -- AAA structure, isolation, assertion quality, naming (always when writing tests)
+1. `framework:knowledge-priming` -- Load project context (tech stack, architecture, conventions) so implementation matches the real project (always)
+2. `framework:context-anchoring` -- Load or discover an existing context anchor document; enrich it as implementation decisions are made (always)
+3. `framework:clean-architecture` -- Layer placement, dependency direction, command/query flow classification (always)
+4. `framework:clean-code` -- Code craft guardrails: SRP, naming, complexity, error handling (always)
+5. `framework:domain-driven-design` -- Aggregates, entities, value objects, domain services (conditional: only when touching domain folder)
+6. `framework:secure-coding` -- Trust boundaries, injection prevention, secrets management (conditional: only for boundary-crossing code)
+7. `framework:test-quality` -- AAA structure, isolation, assertion quality, naming (always when writing tests)
 
 ## Workflow
 

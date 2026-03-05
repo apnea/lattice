@@ -9,10 +9,11 @@ description: "Run a complete design workflow -- from establishing context throug
 
 Read and apply these skills in order:
 
-1. `framework:context-anchoring` -- Create or load the feature's context anchor document
-2. `framework:design-first` -- Walk through 5 progressive design levels
-3. `framework:clean-architecture` -- Apply structural rules at Component and Interaction levels
-4. `framework:domain-driven-design` -- Apply domain modeling at Component, Interaction, and Contract levels
+1. `framework:knowledge-priming` -- Load project context (tech stack, architecture, conventions) to ground all design decisions in the real project
+2. `framework:context-anchoring` -- Create or load the feature's context anchor document
+3. `framework:design-first` -- Walk through 5 progressive design levels
+4. `framework:clean-architecture` -- Apply structural rules at Component and Interaction levels
+5. `framework:domain-driven-design` -- Apply domain modeling at Component, Interaction, and Contract levels
 
 ## Workflow
 

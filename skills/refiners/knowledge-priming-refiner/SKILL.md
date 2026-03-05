@@ -17,7 +17,7 @@ This is not about how to write good code -- that is handled by the `clean-code` 
 - **Mode**: Override is the standard approach -- every project's knowledge base is unique, so there are no generic defaults to overlay on. Overlay mode is available for selective revisions of an existing document.
 - **Config key**: `paths.knowledge_base` in `.ai/config.yaml`
 - **Template**: Read `./assets/template.md` for the full document structure and interview guidance comments
-- **Consumed by**: Other skills as ambient context; can be auto-loaded via SessionStart hooks
+- **Consumed by**: The `knowledge-priming` atom loads this document via config resolution and provides it as ambient project context to all skills and molecules
 
 ## Scope Boundary
 
