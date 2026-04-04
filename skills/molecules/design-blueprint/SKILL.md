@@ -14,9 +14,15 @@ Read and apply these skills in order:
 3. `framework:collaborative-judgment` -- Surface genuine design judgment calls with structured options instead of silently assuming (always)
 4. `framework:design-first` -- Walk through 5 progressive design levels
 5. `framework:clean-architecture` -- Apply structural rules at Component and Interaction levels
+   → Skip if `disable.clean_architecture: true` in `.ai/config.yaml`
 6. `framework:domain-driven-design` -- Apply domain modeling at Component, Interaction, and Contract levels
+   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
 
 ## Workflow
+
+### Disable Check
+
+Read `.ai/config.yaml`. Note any `disable.*` flags set to `true`. Wherever a skill line above is marked "→ Skip if ...", skip that atom for the entire workflow. All references to the skipped atom in subsequent steps — layer assignments and structural validation at Levels 2–4, and domain modeling checks — are also skipped. The design levels themselves still proceed; only the architectural atom checks within each level are removed.
 
 ### Step 1: Establish Context
 

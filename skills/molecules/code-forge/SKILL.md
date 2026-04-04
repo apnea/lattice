@@ -13,12 +13,18 @@ Read and apply these skills:
 2. `framework:context-anchoring` -- Load or discover an existing context anchor document; enrich it as implementation decisions are made (always)
 3. `framework:collaborative-judgment` -- Surface genuine judgment calls with structured options instead of silently assuming (always)
 4. `framework:clean-architecture` -- Layer placement, dependency direction, command/query flow classification (always)
+   → Skip if `disable.clean_architecture: true` in `.ai/config.yaml`
 5. `framework:clean-code` -- Code craft guardrails: SRP, naming, complexity, error handling (always)
 6. `framework:domain-driven-design` -- Aggregates, entities, value objects, domain services (conditional: only when touching domain folder)
+   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
 7. `framework:secure-coding` -- Trust boundaries, injection prevention, secrets management (conditional: only for boundary-crossing code)
 8. `framework:test-quality` -- AAA structure, isolation, assertion quality, naming (always when writing tests)
 
 ## Workflow
+
+### Disable Check
+
+Read `.ai/config.yaml`. Note any `disable.*` flags set to `true`. Wherever a skill line above is marked "→ Skip if ...", skip that atom for the entire workflow. All references to the skipped atom in subsequent steps — layer classification heuristics, self-validation checklists, anti-pattern scans, and cross-component verification — are also skipped.
 
 ### Step 1: Establish Implementation Context
 

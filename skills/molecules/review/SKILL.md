@@ -13,7 +13,9 @@ Load and apply these skills based on the scope of the review (see Step 2 for con
 2. `framework:collaborative-judgment` -- Surface borderline findings with both interpretations instead of silently classifying (always loaded)
 3. `framework:clean-code` -- Code craft validation: SRP, naming, complexity, error handling (always loaded)
 4. `framework:clean-architecture` -- Structural validation: layer rules, dependency direction, command/query flows (conditional)
+   → Skip if `disable.clean_architecture: true` in `.ai/config.yaml`
 5. `framework:domain-driven-design` -- Domain modeling validation: aggregates, entities, value objects (conditional)
+   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
 6. `framework:secure-coding` -- Security validation: trust boundaries, injection, secrets, input handling (conditional)
 7. `framework:test-quality` -- Test validation: AAA structure, isolation, assertions, naming (conditional)
 
@@ -45,6 +47,10 @@ The review-standards document has 7 sections that map to workflow steps:
 Each step below notes where config applies with "**Config override**" callouts. When no review-standards document exists, these callouts are ignored and defaults apply.
 
 ## Workflow
+
+### Disable Check
+
+Read `.ai/config.yaml`. Note any `disable.*` flags set to `true`. Wherever a skill line above is marked "→ Skip if ...", skip that atom for the entire workflow. Do not load the skipped atom in Step 2, do not run its validation checklist or anti-pattern scan in Step 3, and do not include it in the report in Step 4.
 
 ### Step 1: Identify the Delta
 

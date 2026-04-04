@@ -15,10 +15,16 @@ Load and apply these skills based on the bug's scope (see Steps 2 and 5 for cond
 4. `framework:clean-code` -- Keep the fix focused, readable, and minimal in scope (always loaded)
 5. `framework:test-quality` -- Create and validate the failing regression test that proves the bug exists and the fix works (always loaded)
 6. `framework:clean-architecture` -- Validate layer placement, dependency direction, and correct repair location (conditional)
+   → Skip if `disable.clean_architecture: true` in `.ai/config.yaml`
 7. `framework:domain-driven-design` -- Validate invariants, aggregate boundaries, and domain behavior when the bug involves domain logic (conditional)
+   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
 8. `framework:secure-coding` -- Validate trust boundaries, input handling, authorization, and injection safety when the bug touches security-sensitive code (conditional)
 
 ## Workflow
+
+### Disable Check
+
+Read `.ai/config.yaml`. Note any `disable.*` flags set to `true`. Wherever a skill line above is marked "→ Skip if ...", skip that atom for the entire workflow. All references to the skipped atom in subsequent steps — conditional loading in Step 2, atom application in Step 5, and structural verification in Step 6 — are also skipped.
 
 ### Step 1: Establish Bug Context
 

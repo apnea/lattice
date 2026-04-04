@@ -15,6 +15,10 @@ paths:
   secure_coding: .ai/standards/secure-coding.md
   review_standards: .ai/standards/review-standards.md
   context_base: .ai/context/
+
+disable:
+  clean_architecture: false
+  domain_driven_design: false
 ```
 
 ## Top-level Fields
@@ -23,6 +27,7 @@ paths:
 |-------|------|-------------|
 | `version` | integer | Schema version. Currently `1`. |
 | `paths` | map | Logical key → file path mappings. All keys are optional. |
+| `disable` | map | Behavioral flags to skip specific atoms in all molecules. All keys default to `false`. |
 
 ## `paths` Keys
 
@@ -36,6 +41,25 @@ paths:
 | `secure_coding` | Trust boundaries and injection prevention — input validation, secrets management, authorization, error message policies. | `secure-coding-refiner` | `.ai/standards/secure-coding.md` | `secure-coding` atom | `overlay` (recommended) |
 | `review_standards` | Review process configuration — atom loading policy, severity classification, report format, insight capture. Molecule-level config, not atom-level. | `review-refiner` | `.ai/standards/review-standards.md` | `review` molecule | `overlay` (recommended) |
 | `context_base` | **Directory** path for per-feature living documents. Unlike all other keys, this is a directory, not a file. | (none — managed by `context-anchoring` atom) | `.ai/context/` | `context-anchoring` atom | N/A |
+
+## `disable` Keys
+
+The `disable` key is a behavioral section, separate from `paths`. It controls whether specific atoms are loaded by molecules. Omitting a key is equivalent to `false` — existing projects are unaffected. Both flags are independent; you can disable one without the other. Disable means fully skip — there is no "apply with reduced strictness" mode.
+
+| Key | Type | Default | Purpose | Consumed by |
+|-----|------|---------|---------|-------------|
+| `clean_architecture` | boolean | `false` | When `true`, all molecules skip `framework:clean-architecture` entirely. No defaults loaded, no partial application. | `code-forge`, `review`, `refactor-safely`, `design-blueprint`, `bug-fix` |
+| `domain_driven_design` | boolean | `false` | When `true`, all molecules skip `framework:domain-driven-design` entirely. No defaults loaded, no partial application. | `code-forge`, `review`, `refactor-safely`, `design-blueprint`, `bug-fix` |
+
+**Example — disable both for a team using a non-clean-architecture style:**
+
+```yaml
+disable:
+  clean_architecture: true
+  domain_driven_design: true
+```
+
+Atom SKILL.md files are unchanged — atoms do not need to know they can be disabled. Config resolution inside atoms is also unchanged. The disable mechanism lives entirely in the molecule layer.
 
 ## Custom Document Frontmatter
 

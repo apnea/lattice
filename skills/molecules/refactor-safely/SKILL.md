@@ -16,10 +16,16 @@ Load and apply these skills based on the refactor's scope (see Steps 3, 5, and 6
 5. `framework:test-quality` -- Lock current behavior with characterization tests and keep the safety net reliable throughout the refactor (always loaded)
 6. `framework:design-first` -- Use progressive design selectively for significant structural changes so the target structure is agreed before editing code (conditional)
 7. `framework:clean-architecture` -- Validate layer placement, dependency direction, command/query flow, and correct structural boundaries (conditional)
+   → Skip if `disable.clean_architecture: true` in `.ai/config.yaml`
 8. `framework:domain-driven-design` -- Validate domain behavior, aggregate boundaries, and movement of business rules into the correct domain objects (conditional)
+   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
 9. `framework:secure-coding` -- Preserve validation, authorization, trust-boundary protections, and safe data handling when the refactor touches security-sensitive code (conditional)
 
 ## Workflow
+
+### Disable Check
+
+Read `.ai/config.yaml`. Note any `disable.*` flags set to `true`. Wherever a skill line above is marked "→ Skip if ...", skip that atom for the entire workflow. All references to the skipped atom in subsequent steps — structural plan validation, conditional atom application in Step 6, and structural verification in Step 7 — are also skipped.
 
 ### Step 1: Establish Refactor Context
 
