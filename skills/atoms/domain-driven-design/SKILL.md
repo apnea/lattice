@@ -9,7 +9,7 @@ description: "Apply DDD tactical patterns when working with domain code. Enforce
 
 This skill supports project-specific customizations. Resolution order:
 
-1. Look for `.ai/config.yaml` in the repository root
+1. Look for `.lattice/config.yaml` in the repository root
 2. If found, check `paths.ddd_principles` for a custom document path
 3. If the custom path exists, read that document and check its YAML frontmatter for `mode`:
    - **`mode: override`** (or no mode specified): The custom document takes full precedence.

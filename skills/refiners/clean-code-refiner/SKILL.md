@@ -7,12 +7,12 @@ description: "Facilitate a structured conversation to define clean code principl
 
 ## What This Produces
 
-- **Output**: `.ai/standards/clean-code.md` (or custom path from `.ai/config.yaml` -> `paths.clean_code`)
+- **Output**: `.lattice/standards/clean-code.md` (or custom path from `.lattice/config.yaml` -> `paths.clean_code`)
 - **Two modes**:
   - **Overlay** (`mode: overlay`): A slim document containing only sections that differ from the defaults. The clean-code atom reads its embedded defaults first, then applies this document's sections on top. This is the expected common case.
   - **Override** (`mode: override`): A comprehensive standalone document that fully replaces the atom's embedded defaults. For teams with fundamentally different coding standards.
 - **Default mode**: Overlay -- produces only what the user wants to change
-- **Config key**: `paths.clean_code` in `.ai/config.yaml`
+- **Config key**: `paths.clean_code` in `.lattice/config.yaml`
 - **Template**: Read `./assets/template.md` for the full document structure, default content, and interview guidance comments
 
 ## Scope Clarification
@@ -29,7 +29,7 @@ This skill defines the *rules of code craftsmanship* -- how individual functions
 
 Before starting the interview, check whether a custom document already exists:
 
-1. Read `.ai/config.yaml` -- does `paths.clean_code` point to a file?
+1. Read `.lattice/config.yaml` -- does `paths.clean_code` point to a file?
 2. If yes, read that file. Ask the user:
    - "You already have a custom clean code document. Would you like to **revise** it (update specific sections), **start fresh** (new interview), or **add to it** (add new sections)?"
    - Revise: Load the existing document, walk through only the sections the user wants to change, and update in place.
@@ -171,21 +171,21 @@ For each of the 10 default sections:
 Strip all `<!-- INTERVIEW GUIDANCE: -->` comments from the output. The final document is a clean specification.
 
 **Determine output path:**
-1. If `.ai/config.yaml` exists and has `paths.clean_code`, use that path.
-2. Otherwise, default to `.ai/standards/clean-code.md`.
+1. If `.lattice/config.yaml` exists and has `paths.clean_code`, use that path.
+2. Otherwise, default to `.lattice/standards/clean-code.md`.
 
 **Write the document:**
-1. Create `.ai/standards/` directory (and `.ai/` parent) if it does not exist.
+1. Create `.lattice/standards/` directory (and `.lattice/` parent) if it does not exist.
 2. Write the document to the determined path.
 
 **Update config:**
-1. If `.ai/config.yaml` does not exist, create it with:
+1. If `.lattice/config.yaml` does not exist, create it with:
    ```yaml
    paths:
-     clean_code: .ai/standards/clean-code.md
+     clean_code: .lattice/standards/clean-code.md
    ```
-2. If `.ai/config.yaml` exists but has no `paths.clean_code`, add the key. Preserve all existing content.
-3. If `.ai/config.yaml` exists and already has the key, no config change needed.
+2. If `.lattice/config.yaml` exists but has no `paths.clean_code`, add the key. Preserve all existing content.
+3. If `.lattice/config.yaml` exists and already has the key, no config change needed.
 
 **Confirm to user:**
 "Your clean code document has been written to `[PATH]` in **[overlay|override]** mode. The clean-code atom will now use it [on top of the defaults | instead of the defaults]."
@@ -216,5 +216,5 @@ Before writing the final document, verify:
 
 - [ ] Frontmatter is valid YAML with correct mode value
 - [ ] Document is well-formatted markdown
-- [ ] Config file (`.ai/config.yaml`) is correctly updated
+- [ ] Config file (`.lattice/config.yaml`) is correctly updated
 - [ ] Output path exists and is writable

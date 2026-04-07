@@ -18,8 +18,8 @@ Before anything else, ask the user which architecture style their team uses:
 
 **Branching:**
 
-- **Option 1** → proceed to the clean architecture flow below (existing interview). Template: `./assets/template-clean-arch.md`. Output: `.ai/standards/architecture.md`. Config key: `paths.architecture`. No `architecture_mode` key needed (defaults to `clean`).
-- **Options 2–4** → proceed to the generic architecture flow. Template: `./assets/template-generic.md`. Output: `.ai/standards/architecture.md`. Config key: `paths.architecture`. Additionally, set `architecture_mode: custom` in `.ai/config.yaml`.
+- **Option 1** → proceed to the clean architecture flow below (existing interview). Template: `./assets/template-clean-arch.md`. Output: `.lattice/standards/architecture.md`. Config key: `paths.architecture`. No `architecture_mode` key needed (defaults to `clean`).
+- **Options 2–4** → proceed to the generic architecture flow. Template: `./assets/template-generic.md`. Output: `.lattice/standards/architecture.md`. Config key: `paths.architecture`. Additionally, set `architecture_mode: custom` in `.lattice/config.yaml`.
 
 The rest of this document describes the **clean architecture flow** (Option 1). For the **generic flow** (Options 2–4), read `./assets/template-generic.md` and follow its `<!-- INTERVIEW GUIDANCE: -->` comments. The facilitation approach, conversation style, output assembly, and document quality checks below apply to both flows — substitute the appropriate template, output path, and config key.
 
@@ -27,20 +27,20 @@ The rest of this document describes the **clean architecture flow** (Option 1). 
 
 **For clean architecture (Option 1):**
 
-- **Output**: `.ai/standards/architecture.md` (or custom path from `.ai/config.yaml` → `paths.architecture`)
+- **Output**: `.lattice/standards/architecture.md` (or custom path from `.lattice/config.yaml` → `paths.architecture`)
 - **Two modes**:
   - **Overlay** (`mode: overlay`): A slim document containing only sections that differ from the defaults. The architecture atom reads its embedded clean-architecture defaults first, then applies this document's sections on top. This is the expected common case.
   - **Override** (`mode: override`): A comprehensive standalone document that fully replaces the atom's embedded defaults. For teams that want to define clean architecture from scratch.
 - **Default mode**: Overlay -- produces only what the user wants to change
-- **Config key**: `paths.architecture` in `.ai/config.yaml`
+- **Config key**: `paths.architecture` in `.lattice/config.yaml`
 - **Template**: Read `./assets/template-clean-arch.md` for the full document structure, default content, and interview guidance comments
 
 **For other styles (Options 2–4):**
 
-- **Output**: `.ai/standards/architecture.md` (or custom path from `.ai/config.yaml` → `paths.architecture`)
+- **Output**: `.lattice/standards/architecture.md` (or custom path from `.lattice/config.yaml` → `paths.architecture`)
 - **Mode**: Always `override` — there are no embedded defaults to overlay onto for non-clean-architecture styles
-- **Config key**: `paths.architecture` in `.ai/config.yaml`
-- **Additional config**: Sets `architecture_mode: custom` in `.ai/config.yaml`
+- **Config key**: `paths.architecture` in `.lattice/config.yaml`
+- **Additional config**: Sets `architecture_mode: custom` in `.lattice/config.yaml`
 - **Template**: Read `./assets/template-generic.md` for the document structure and interview guidance comments
 
 ## Before You Begin
@@ -49,7 +49,7 @@ The rest of this document describes the **clean architecture flow** (Option 1). 
 
 Before starting the interview, check whether a custom document already exists:
 
-1. Read `.ai/config.yaml` — check `paths.architecture`.
+1. Read `.lattice/config.yaml` — check `paths.architecture`.
 2. If the relevant path exists (based on the style selected in Step 0), read that file. Ask the user:
    - "You already have a custom architecture document. Would you like to **revise** it (update specific sections), **start fresh** (new interview), or **add to it** (add new sections)?"
    - Revise: Load the existing document, walk through only the sections the user wants to change, and update in place.
@@ -188,34 +188,34 @@ Strip all `<!-- INTERVIEW GUIDANCE: -->` comments from the output. The final doc
 
 **Determine output path:**
 
-1. If `.ai/config.yaml` exists and has `paths.architecture`, use that path.
-2. Otherwise, default to `.ai/standards/architecture.md`.
+1. If `.lattice/config.yaml` exists and has `paths.architecture`, use that path.
+2. Otherwise, default to `.lattice/standards/architecture.md`.
 
 This is the same for all styles — both clean architecture customizations and other styles write to `paths.architecture`.
 
 **Write the document:**
-1. Create `.ai/standards/` directory (and `.ai/` parent) if it does not exist.
+1. Create `.lattice/standards/` directory (and `.lattice/` parent) if it does not exist.
 2. Write the document to the determined path.
 
 **Update config:**
 
 For clean architecture (Option 1):
-1. If `.ai/config.yaml` does not exist, create it with:
+1. If `.lattice/config.yaml` does not exist, create it with:
    ```yaml
    paths:
-     architecture: .ai/standards/architecture.md
+     architecture: .lattice/standards/architecture.md
    ```
-2. If `.ai/config.yaml` exists but has no `paths.architecture`, add the key. Preserve all existing content.
-3. If `.ai/config.yaml` exists and already has the key, no config change needed.
+2. If `.lattice/config.yaml` exists but has no `paths.architecture`, add the key. Preserve all existing content.
+3. If `.lattice/config.yaml` exists and already has the key, no config change needed.
 
 For other styles (Options 2–4):
-1. If `.ai/config.yaml` does not exist, create it with:
+1. If `.lattice/config.yaml` does not exist, create it with:
    ```yaml
    paths:
-     architecture: .ai/standards/architecture.md
+     architecture: .lattice/standards/architecture.md
    architecture_mode: custom
    ```
-2. If `.ai/config.yaml` exists, add or update:
+2. If `.lattice/config.yaml` exists, add or update:
    - `paths.architecture` pointing to the output path
    - `architecture_mode: custom`
    - Preserve all existing content.
@@ -267,5 +267,5 @@ Before writing the final document, verify:
 
 - [ ] Frontmatter is valid YAML with correct mode value
 - [ ] Document is well-formatted markdown
-- [ ] Config file (`.ai/config.yaml`) is correctly updated
+- [ ] Config file (`.lattice/config.yaml`) is correctly updated
 - [ ] Output path exists and is writable

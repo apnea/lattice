@@ -1,20 +1,20 @@
 # Configuration Reference
 
-`.ai/config.yaml` is the central config file for a Lattice-enabled project. It maps logical keys to project-specific documents that atoms and molecules load at runtime. The file is optional — all skills work out of the box with embedded defaults. Add keys only when you want to customize a skill's behavior. See [how-it-works.md](how-it-works.md#config-resolution) for how the resolution algorithm works.
+`.lattice/config.yaml` is the central config file for a Lattice-enabled project. It maps logical keys to project-specific documents that atoms and molecules load at runtime. The file is optional — all skills work out of the box with embedded defaults. Add keys only when you want to customize a skill's behavior. See [how-it-works.md](how-it-works.md#config-resolution) for how the resolution algorithm works.
 
 ## File Structure
 
 ```yaml
 version: 1
 paths:
-  knowledge_base: .ai/standards/knowledge-base.md
-  clean_code: .ai/standards/clean-code.md
-  architecture: .ai/standards/architecture.md
-  ddd_principles: .ai/standards/ddd-principles.md
-  test_quality: .ai/standards/test-quality.md
-  secure_coding: .ai/standards/secure-coding.md
-  review_standards: .ai/standards/review-standards.md
-  context_base: .ai/context/
+  knowledge_base: .lattice/standards/knowledge-base.md
+  clean_code: .lattice/standards/clean-code.md
+  architecture: .lattice/standards/architecture.md
+  ddd_principles: .lattice/standards/ddd-principles.md
+  test_quality: .lattice/standards/test-quality.md
+  secure_coding: .lattice/standards/secure-coding.md
+  review_standards: .lattice/standards/review-standards.md
+  context_base: .lattice/context/
 
 architecture_mode: clean
 
@@ -35,14 +35,14 @@ disable:
 
 | Key | Purpose | Produced by | Default path | Consumed by | Mode |
 |-----|---------|-------------|--------------|-------------|------|
-| `knowledge_base` | Project identity — tech stack, architecture, conventions, trusted sources. No embedded default; every project is unique. | `knowledge-priming-refiner` | `.ai/standards/knowledge-base.md` | `knowledge-priming` atom | `override` (standard) |
-| `clean_code` | Code craftsmanship rules — function size, naming, complexity, error handling. | `clean-code-refiner` | `.ai/standards/clean-code.md` | `clean-code` atom | `overlay` (recommended) |
-| `architecture` | Architecture standards — layer structure, dependency rules, structural validation. Used by both clean architecture mode and custom architecture mode. | `architecture-refiner` | `.ai/standards/architecture.md` | `architecture` atom | `overlay` (clean mode) or `override` (custom mode) |
-| `ddd_principles` | Tactical DDD patterns — aggregate design, entity/value object rules, domain services, domain events. | `ddd-refiner` | `.ai/standards/ddd-principles.md` | `domain-driven-design` atom | `overlay` (recommended) |
-| `test_quality` | Test structure and quality rules — AAA structure, isolation, assertion patterns, naming conventions. | `test-quality-refiner` | `.ai/standards/test-quality.md` | `test-quality` atom | `overlay` (recommended) |
-| `secure_coding` | Trust boundaries and injection prevention — input validation, secrets management, authorization, error message policies. | `secure-coding-refiner` | `.ai/standards/secure-coding.md` | `secure-coding` atom | `overlay` (recommended) |
-| `review_standards` | Review process configuration — atom loading policy, severity classification, report format, insight capture. Molecule-level config, not atom-level. | `review-refiner` | `.ai/standards/review-standards.md` | `review` molecule | `overlay` (recommended) |
-| `context_base` | **Directory** path for per-feature living documents. Unlike all other keys, this is a directory, not a file. | (none — managed by `context-anchoring` atom) | `.ai/context/` | `context-anchoring` atom | N/A |
+| `knowledge_base` | Project identity — tech stack, architecture, conventions, trusted sources. No embedded default; every project is unique. | `knowledge-priming-refiner` | `.lattice/standards/knowledge-base.md` | `knowledge-priming` atom | `override` (standard) |
+| `clean_code` | Code craftsmanship rules — function size, naming, complexity, error handling. | `clean-code-refiner` | `.lattice/standards/clean-code.md` | `clean-code` atom | `overlay` (recommended) |
+| `architecture` | Architecture standards — layer structure, dependency rules, structural validation. Used by both clean architecture mode and custom architecture mode. | `architecture-refiner` | `.lattice/standards/architecture.md` | `architecture` atom | `overlay` (clean mode) or `override` (custom mode) |
+| `ddd_principles` | Tactical DDD patterns — aggregate design, entity/value object rules, domain services, domain events. | `ddd-refiner` | `.lattice/standards/ddd-principles.md` | `domain-driven-design` atom | `overlay` (recommended) |
+| `test_quality` | Test structure and quality rules — AAA structure, isolation, assertion patterns, naming conventions. | `test-quality-refiner` | `.lattice/standards/test-quality.md` | `test-quality` atom | `overlay` (recommended) |
+| `secure_coding` | Trust boundaries and injection prevention — input validation, secrets management, authorization, error message policies. | `secure-coding-refiner` | `.lattice/standards/secure-coding.md` | `secure-coding` atom | `overlay` (recommended) |
+| `review_standards` | Review process configuration — atom loading policy, severity classification, report format, insight capture. Molecule-level config, not atom-level. | `review-refiner` | `.lattice/standards/review-standards.md` | `review` molecule | `overlay` (recommended) |
+| `context_base` | **Directory** path for per-feature living documents. Unlike all other keys, this is a directory, not a file. | (none — managed by `context-anchoring` atom) | `.lattice/context/` | `context-anchoring` atom | N/A |
 
 ## `architecture_mode` Key
 
@@ -92,4 +92,4 @@ mode: overlay
 
 **Via a refiner** (recommended): Run the corresponding refiner skill (e.g., `/architecture-refiner`). The guided interview produces the standards document and writes the config key automatically.
 
-**By hand**: Create `.ai/config.yaml` at the repo root and add keys pointing to documents you have written or will write. Re-run a refiner or edit the standards document directly whenever your standards evolve.
+**By hand**: Create `.lattice/config.yaml` at the repo root and add keys pointing to documents you have written or will write. Re-run a refiner or edit the standards document directly whenever your standards evolve.

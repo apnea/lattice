@@ -1,6 +1,6 @@
 ---
 name: lattice-init
-description: "Guided setup experience for new Lattice projects -- scans the repository, detects existing configuration, suggests refiners in priority order, and creates the .ai/ config. Bridges the gap between installing skills and getting first value. Use when the user says 'lattice init', 'set up lattice', 'initialize lattice', 'get started with lattice', or 'configure lattice for this project'."
+description: "Guided setup experience for new Lattice projects -- scans the repository, detects existing configuration, suggests refiners in priority order, and creates the .lattice/ config. Bridges the gap between installing skills and getting first value. Use when the user says 'lattice init', 'set up lattice', 'initialize lattice', 'get started with lattice', or 'configure lattice for this project'."
 ---
 
 # Lattice Init
@@ -35,16 +35,16 @@ If multiple language markers are found at the repository root, note all of them 
 - `cmd/`, `internal/`, `pkg/` → Go project structure
 - `domain/`, `infrastructure/`, `application/` → layered architecture
 
-**Existing `.ai/` state** -- check what Lattice artifacts already exist:
-- `.ai/config.yaml` → central config
-- `.ai/standards/knowledge-base.md` → knowledge priming output
-- `.ai/standards/architecture.md` → architecture refiner output (clean architecture, hexagonal, modular monolith, or custom style)
-- `.ai/standards/clean-code.md` → clean code refiner output
-- `.ai/standards/ddd-principles.md` → DDD refiner output
-- `.ai/standards/review-standards.md` → review refiner output
-- `.ai/context/` → feature context documents (count them)
-- `.ai/learnings/review-insights.md` → accumulated review insights
-- `.ai/reviews/review-log.md` → review log
+**Existing `.lattice/` state** -- check what Lattice artifacts already exist:
+- `.lattice/config.yaml` → central config
+- `.lattice/standards/knowledge-base.md` → knowledge priming output
+- `.lattice/standards/architecture.md` → architecture refiner output (clean architecture, hexagonal, modular monolith, or custom style)
+- `.lattice/standards/clean-code.md` → clean code refiner output
+- `.lattice/standards/ddd-principles.md` → DDD refiner output
+- `.lattice/standards/review-standards.md` → review refiner output
+- `.lattice/context/` → feature context documents (count them)
+- `.lattice/learnings/review-insights.md` → accumulated review insights
+- `.lattice/reviews/review-log.md` → review log
 
 ### Step 2: Present Findings
 
@@ -57,9 +57,9 @@ Report what was found -- concise, structured. Present to the user:
 **Structure**: [key directories found]
 
 ### Lattice Setup Status
-- `.ai/config.yaml`: [exists / not found]
-- Knowledge base: [found at .ai/standards/knowledge-base.md / not found]
-- Architecture standards: [found at .ai/standards/architecture.md / not found]
+- `.lattice/config.yaml`: [exists / not found]
+- Knowledge base: [found at .lattice/standards/knowledge-base.md / not found]
+- Architecture standards: [found at .lattice/standards/architecture.md / not found]
 - Clean code standards: [found / not found]
 - DDD standards: [found / not found]
 - Review standards: [found / not found]
@@ -76,26 +76,26 @@ Based on gaps found in Step 2, suggest refiners in priority order. Walk the user
 
 **Priority order**:
 
-1. **Knowledge-priming-refiner** (if `.ai/standards/knowledge-base.md` is missing) -- "Captures your project's identity -- tech stack, architecture, directory layout, and conventions. Every other skill uses this context to make better decisions."
-2. **Architecture-refiner** (if `.ai/standards/architecture.md` is missing AND the project has a source code directory) -- "Defines your project's architecture standards — layer structure, dependency rules, and validation checklist. Supports multiple styles: clean architecture (default), hexagonal / ports & adapters, modular monolith, or custom."
-3. **DDD-refiner** (if `.ai/standards/ddd-principles.md` is missing AND the project has a domain folder or domain-like structure) -- "Captures your aggregate design rules, entity patterns, and domain event conventions so the DDD atom enforces your domain modeling style."
-4. **Clean-code-refiner** (if `.ai/standards/clean-code.md` is missing) -- "Tailors coding standards -- function size limits, complexity thresholds, naming conventions. The defaults work well for most projects, so this is optional."
-5. **Review-refiner** (if `.ai/standards/review-standards.md` is missing) -- "Customizes how the review molecule works -- atom loading rules, severity levels, report format, scope rules. The defaults work well for most projects, so this is optional."
+1. **Knowledge-priming-refiner** (if `.lattice/standards/knowledge-base.md` is missing) -- "Captures your project's identity -- tech stack, architecture, directory layout, and conventions. Every other skill uses this context to make better decisions."
+2. **Architecture-refiner** (if `.lattice/standards/architecture.md` is missing AND the project has a source code directory) -- "Defines your project's architecture standards — layer structure, dependency rules, and validation checklist. Supports multiple styles: clean architecture (default), hexagonal / ports & adapters, modular monolith, or custom."
+3. **DDD-refiner** (if `.lattice/standards/ddd-principles.md` is missing AND the project has a domain folder or domain-like structure) -- "Captures your aggregate design rules, entity patterns, and domain event conventions so the DDD atom enforces your domain modeling style."
+4. **Clean-code-refiner** (if `.lattice/standards/clean-code.md` is missing) -- "Tailors coding standards -- function size limits, complexity thresholds, naming conventions. The defaults work well for most projects, so this is optional."
+5. **Review-refiner** (if `.lattice/standards/review-standards.md` is missing) -- "Customizes how the review molecule works -- atom loading rules, severity levels, report format, scope rules. The defaults work well for most projects, so this is optional."
 
 **For each gap**, present to the user:
 - What the refiner does (one sentence, from the descriptions above)
 - Three choices: **Run it now**, **Skip for later**, or **Skip all remaining**
 
-**If user says "run it"** → Tell the user to invoke the refiner: "Run `/[refiner-name]` now to start the guided interview." If a refiner exits before completing, the user can re-run it — existing partial output in `.ai/standards/` will not block the interview from restarting.
+**If user says "run it"** → Tell the user to invoke the refiner: "Run `/[refiner-name]` now to start the guided interview." If a refiner exits before completing, the user can re-run it — existing partial output in `.lattice/standards/` will not block the interview from restarting.
 
 **If user says "skip"** → Move to the next refiner in priority order.
 
 **If user says "skip all"** → Jump to Step 4.
 
-**Config creation**: If `.ai/config.yaml` does not exist and the user did not run any refiners (skipped all), create a minimal config file:
+**Config creation**: If `.lattice/config.yaml` does not exist and the user did not run any refiners (skipped all), create a minimal config file:
 
 ```yaml
-# .ai/config.yaml -- Lattice Framework Configuration
+# .lattice/config.yaml -- Lattice Framework Configuration
 # All paths are relative to the repository root.
 # Run refiners to populate: /knowledge-priming-refiner, /architecture-refiner, /ddd-refiner, /clean-code-refiner, /review-refiner
 

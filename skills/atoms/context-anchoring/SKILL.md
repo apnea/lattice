@@ -9,10 +9,10 @@ description: "Manage per-feature living documents that capture decisions, constr
 
 This skill manages a directory of per-feature context documents. Resolution order:
 
-1. Look for `.ai/config.yaml` in the repository root
+1. Look for `.lattice/config.yaml` in the repository root
 2. If found, check `paths.context_base` for a custom directory path
 3. If the custom path exists, use that directory for context documents
-4. If no config, no path, or path not found, use default `.ai/context/`
+4. If no config, no path, or path not found, use default `.lattice/context/`
 
 Each feature gets one document at `<context_base>/<feature-name>.md`. There are no default principles, no overlay modes, no override files -- just a thin template and per-feature documents that grow through enrichment.
 

@@ -1,6 +1,6 @@
 # Architecture Refiner Template (Generic)
 
-This template defines the structure of the `.ai/standards/architecture.md` output document for non-clean-architecture styles (hexagonal, modular monolith, custom, etc.). Used when `architecture_mode: custom` is set. It contains interview guidance comments that are stripped from the final output.
+This template defines the structure of the `.lattice/standards/architecture.md` output document for non-clean-architecture styles (hexagonal, modular monolith, custom, etc.). Used when `architecture_mode: custom` is set. It contains interview guidance comments that are stripped from the final output.
 
 When producing the output, strip all `<!-- INTERVIEW GUIDANCE: -->` comments. The final document is a specification, not a conversation log.
 

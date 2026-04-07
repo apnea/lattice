@@ -2,7 +2,7 @@
 
 These are the embedded opinionated defaults for test quality. They synthesize Gerard Meszaros's xUnit Test Patterns, Kent Beck's Test-Driven Development, and Martin Fowler's testing guidance into one actionable set of guidelines for writing effective tests.
 
-If the project has a custom `.ai/test-quality.md` (referenced through `.ai/config.yaml`), that document takes precedence over everything here.
+If the project has a custom `.lattice/test-quality.md` (referenced through `.lattice/config.yaml`), that document takes precedence over everything here.
 
 ## Table of Contents
 

@@ -16,7 +16,7 @@ Each tier builds on the one below it. Molecules compose atoms. Refiners optional
 
 The three tiers described above are one half of Lattice -- the **base framework**. Atoms, molecules, and refiners are static, composable engineering skills. They ship with the framework, they encode principles and workflows, and they work the same way on every project. The base framework is the skeleton -- structurally correct, portable, and stable.
 
-The second half is the **living context layer**: the `.ai/` folder. Standards produced by refiners, feature context documents, accumulated review insights, and health logs -- all project-specific, all growing with every feature cycle. The living context layer is the muscle -- it strengthens with use, adapts to the work you do, and makes the base framework increasingly capable.
+The second half is the **living context layer**: the `.lattice/` folder. Standards produced by refiners, feature context documents, accumulated review insights, and health logs -- all project-specific, all growing with every feature cycle. The living context layer is the muscle -- it strengthens with use, adapts to the work you do, and makes the base framework increasingly capable.
 
 The two layers interact through a read/write loop. The base framework *reads* from the context layer: atoms load project-specific standards, code-forge, refactor-safely, and bug-fix load past learnings, knowledge-priming loads the project's identity. The pipeline *writes* to the context layer: refiners produce standards documents, design-blueprint and code-forge create and enrich context documents, refactor-safely records approved structural decisions, bug-fix records root cause and repair decisions, and review captures insights and logs health summaries. Each cycle enriches the next.
 
@@ -60,7 +60,7 @@ Four atoms serve different purposes than the code-quality atoms:
 
 Every code-quality atom supports project-specific customization through the same resolution mechanism:
 
-1. Look for `.ai/config.yaml` in the repository root
+1. Look for `.lattice/config.yaml` in the repository root
 2. Check for the atom's config key (e.g., `paths.clean_code`, `paths.architecture`)
 3. If a custom document exists at that path, check its YAML frontmatter for `mode`:
    - **`mode: overlay`** (default, recommended): Read the atom's embedded defaults first, then apply the custom document's sections on top. Sections are matched by heading -- custom sections replace matching defaults, new sections are appended. You can also add entirely new sections (e.g., language-specific idioms, team-specific rules) that do not exist in the defaults.
@@ -69,7 +69,7 @@ Every code-quality atom supports project-specific customization through the same
 
 Atoms work out of the box with opinionated defaults. Customization is opt-in, not required. Most teams use overlay -- the defaults are good starting points, and typically only a few sections need adjustment.
 
-**Two paths to customization**: Run a refiner (guided interview that generates the standards document) or edit the standards document in `.ai/standards/` directly. Both produce the same result: a file the atom picks up through config resolution. Re-run a refiner or edit the file whenever your standards evolve.
+**Two paths to customization**: Run a refiner (guided interview that generates the standards document) or edit the standards document in `.lattice/standards/` directly. Both produce the same result: a file the atom picks up through config resolution. Re-run a refiner or edit the file whenever your standards evolve.
 
 See [docs/configuration.md](configuration.md) for the complete list of valid config keys and what each one does.
 
@@ -86,7 +86,7 @@ Guided setup experience that bridges the gap between installing Lattice and gett
 **Composes**: knowledge-priming
 
 **How it works**:
-1. **Scan the project**: Detects language/framework, directory structure, and existing `.ai/` state.
+1. **Scan the project**: Detects language/framework, directory structure, and existing `.lattice/` state.
 2. **Present findings**: Shows a concise setup status -- what exists, what is missing.
 3. **Guided setup**: Suggests refiners in priority order (knowledge-priming first, then architecture, DDD, clean-code). For each gap, the user can run the refiner, skip it, or skip all remaining.
 4. **Next steps**: Presents the design-to-review workflow so the user knows what to do next.
@@ -114,7 +114,7 @@ Generates implementation from an approved blueprint or verbal requirements.
 **Composes**: knowledge-priming (always), context-anchoring (always), collaborative-judgment (always), architecture (always), clean-code (always), domain-driven-design (conditional: domain layer), secure-coding (conditional: trust boundaries), test-quality (always when writing tests)
 
 **How it works**:
-1. **Load context**: Loads learnings from `.ai/learnings/review-insights.md` (if they exist) to avoid repeating past mistakes. Uses context-anchoring to find and load the feature's blueprint. If none exists, works from verbal requirements -- all atom guardrails still apply.
+1. **Load context**: Loads learnings from `.lattice/learnings/review-insights.md` (if they exist) to avoid repeating past mistakes. Uses context-anchoring to find and load the feature's blueprint. If none exists, works from verbal requirements -- all atom guardrails still apply.
 2. **Plan implementation order**: Classifies components into architectural layers and plans an inside-out build order: Domain → Infrastructure → Application → Interface. Each layer's dependencies already exist when it is built.
 3. **Implement per component**: Generates code and tests together. After generating each component, runs a post-generation verification pass — atom self-validation checklists and anti-pattern scans — fixing violations before presenting. Applies clean-code and architecture to all code. Applies DDD only to domain layer code. Applies secure-coding only at trust boundaries.
 4. **Cross-component verification**: Checks architectural coherence — interaction flows match the blueprint, dependency direction is correct, no unplanned components, and past learnings don't recur.
@@ -154,14 +154,14 @@ A structured, delta-scoped code review that loads atoms conditionally based on w
 
 **Composes**: knowledge-priming (always), collaborative-judgment (always), clean-code (always), architecture (conditional), domain-driven-design (conditional), secure-coding (conditional), test-quality (conditional)
 
-**Config**: Optionally reads `.ai/standards/review-standards.md` (produced by the review-refiner or written by hand) to customize atom loading rules, severity classification, report format, scope rules, insight capture, and health logging. When no review-standards document exists, all defaults apply — identical behavior to a review without config. The boundary: if it changes *what an atom checks for*, it belongs in that atom's refiner; if it changes *how the review process works*, it belongs in the review-refiner.
+**Config**: Optionally reads `.lattice/standards/review-standards.md` (produced by the review-refiner or written by hand) to customize atom loading rules, severity classification, report format, scope rules, insight capture, and health logging. When no review-standards document exists, all defaults apply — identical behavior to a review without config. The boundary: if it changes *what an atom checks for*, it belongs in that atom's refiner; if it changes *how the review process works*, it belongs in the review-refiner.
 
 **How it works**:
 1. **Identify the delta**: Determines the set of changed files (PR, commit, or specified files).
 2. **Classify and load**: Analyzes which layers, domains, and boundaries the delta touches. Loads only the relevant atoms -- a change to a single value object does not trigger the security checklist.
 3. **Run targeted validation**: For each loaded atom, runs two passes: the validation checklist (hard rules) and the anti-pattern scan (smell-level issues).
 4. **Produce report**: Findings are severity-ordered (critical → warning → suggestion) with specific file locations and concrete fixes. Summary mode by default; full mode on request. Every review ends with a "what's done well" observation.
-5. **Capture insights and log**: Appends recurring patterns to `.ai/learnings/review-insights.md` (fed back into code-forge's next session) and logs a structured summary to `.ai/reviews/review-log.md` (project health visibility).
+5. **Capture insights and log**: Appends recurring patterns to `.lattice/learnings/review-insights.md` (fed back into code-forge's next session) and logs a structured summary to `.lattice/reviews/review-log.md` (project health visibility).
 
 See the [refiner inventory](../README.md#refiners-5) for what each refiner produces and which atom or molecule each one targets.
 
@@ -182,18 +182,18 @@ Defect-driven work:
 
 Feature work starts from requirements and produces an approved blueprint before implementation. Refactor work starts from structural pain and produces an approved target structure plus characterization tests before code reshaping begins. Bug work starts from a failing behavior and produces a failing reproduction before the repair. All paths converge on review for an independent quality pass.
 
-Each stage both consumes and produces artifacts in `.ai/` -- the pipeline is the engine that grows the living context layer. Context anchoring ties the stages together: the context document created during design carries the approved blueprint into implementation, captures approved refactor plans and bug root causes, informs review, and restores full context in any future session.
+Each stage both consumes and produces artifacts in `.lattice/` -- the pipeline is the engine that grows the living context layer. Context anchoring ties the stages together: the context document created during design carries the approved blueprint into implementation, captures approved refactor plans and bug root causes, informs review, and restores full context in any future session.
 
 The context document lifecycle is: **Create** (new feature) → **Load** (resume work) → **Enrich** (capture decisions). All three behaviors require explicit user confirmation -- the AI proposes, the user disposes.
 
-## The `.ai/` Folder
+## The `.lattice/` Folder
 
-The `.ai/` folder is the living context layer described earlier -- the project's AI-specific memory that grows with every feature cycle. All persistent artifacts produced by the framework live here, organized into subfolders with distinct lifecycles.
+The `.lattice/` folder is the living context layer described earlier -- the project's AI-specific memory that grows with every feature cycle. All persistent artifacts produced by the framework live here, organized into subfolders with distinct lifecycles.
 
 ### Structure
 
 ```
-.ai/
+.lattice/
 ├── config.yaml          # Central config (only file at root)
 ├── standards/           # Refiner-produced customization documents
 │   ├── knowledge-base.md
@@ -220,7 +220,7 @@ The `.ai/` folder is the living context layer described earlier -- the project's
 
 ### Convention
 
-**Rule**: All persistent artifacts go into subfolders. Never place files directly in `.ai/` root except `config.yaml`.
+**Rule**: All persistent artifacts go into subfolders. Never place files directly in `.lattice/` root except `config.yaml`.
 
 This convention ensures the folder stays organized as the framework adds new capabilities. Every new output type gets its own subfolder with a clear lifecycle.
 
@@ -230,9 +230,9 @@ This convention ensures the folder stays organized as the framework adds new cap
 |-----------|-------|-----------|----------|
 | **Purpose** | Teach one principle | Orchestrate a workflow | Optionally customize atom defaults |
 | **Invocation** | Auto-activate based on context, or invoked by molecules | User invokes explicitly (e.g., `/design-blueprint`) | User invokes when customization is needed (e.g., `/architecture-refiner`) |
-| **Artifacts produced** | None (inline checks) | Blueprints, reviews, context documents | `.ai/` config files |
+| **Artifacts produced** | None (inline checks) | Blueprints, reviews, context documents | `.lattice/` config files |
 | **Composes others?** | No | Yes (composes atoms) | No |
-| **Configured by refiners?** | Yes (via `.ai/` config files) | review molecule supports config via review-refiner | N/A |
+| **Configured by refiners?** | Yes (via `.lattice/` config files) | review molecule supports config via review-refiner | N/A |
 | **Frequency of use** | Every generation (automatic) | Per feature, bug, or review | As needed -- when standards are first set or evolve |
 | **Required?** | Yes (core guardrails) | No (but recommended for structured workflows) | No (atoms work with built-in defaults) |
 | **Works standalone?** | Yes | Yes | Yes |

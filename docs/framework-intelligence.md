@@ -62,7 +62,7 @@ The flywheel is the central mechanism of the living context layer -- the engine 
 
 ```
 ┌────────────────┐     ┌─────────────┐     ┌──────────────────┐
-│   code-forge   │────→│   review    │────→│ .ai/learnings/   │
+│   code-forge   │────→│   review    │────→│ .lattice/learnings/   │
 │ loads learnings│     │ finds issues│     │ review-insights.md│
 └───────┬────────┘     └─────────────┘     └────────┬─────────┘
         │                                           │
@@ -85,7 +85,7 @@ Why this matters: Institutional memory that survives across features and session
 
 **Problem**: No way to answer "Is Lattice actually helping? Are we getting better over time?"
 
-**Solution**: The review molecule appends structured summaries to `.ai/reviews/review-log.md` after each review.
+**Solution**: The review molecule appends structured summaries to `.lattice/reviews/review-log.md` after each review.
 
 ```
 ## 2026-03-05 — Payment endpoint
@@ -132,9 +132,9 @@ Creative task (generation) and analytical task (validation) in separate passes. 
 
 ---
 
-## 6. The `.ai/` Folder as Institutional Memory
+## 6. The `.lattice/` Folder as Institutional Memory
 
-The `.ai/` folder is where the living context layer takes physical form -- standards, context documents, learnings, and health logs, each with a distinct lifecycle. See [how-it-works: The .ai/ Folder](how-it-works.md#the-ai-folder) for the folder structure and lifecycle details.
+The `.lattice/` folder is where the living context layer takes physical form -- standards, context documents, learnings, and health logs, each with a distinct lifecycle. See [how-it-works: The .lattice/ Folder](how-it-works.md#the-ai-folder) for the folder structure and lifecycle details.
 
 ---
 

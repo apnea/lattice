@@ -1,6 +1,6 @@
 # Review Refiner Template
 
-This template defines the structure of the `.ai/standards/review-standards.md` output document. It contains all default values from the review molecule's hardcoded behavior, interleaved with interview guidance comments.
+This template defines the structure of the `.lattice/standards/review-standards.md` output document. It contains all default values from the review molecule's hardcoded behavior, interleaved with interview guidance comments.
 
 When producing the output, strip all `<!-- INTERVIEW GUIDANCE: -->` comments. The final document is a specification, not a conversation log.
 
@@ -419,7 +419,7 @@ Customizable:
 Fixed:
 - Insights must be append-only (no overwriting existing entries)
 - Insights must include a date for recency tracking
-- File path is .ai/learnings/review-insights.md (configurable via config.yaml)
+- File path is .lattice/learnings/review-insights.md (configurable via config.yaml)
 
 Cross-section impact:
 - Capture criteria may reference severity levels from §2
@@ -428,7 +428,7 @@ Cross-section impact:
 
 ### File Location
 
-Append to `.ai/learnings/review-insights.md`. Create the file with a `# Review Insights` heading if it doesn't exist.
+Append to `.lattice/learnings/review-insights.md`. Create the file with a `# Review Insights` heading if it doesn't exist.
 
 ### Entry Format
 
@@ -499,7 +499,7 @@ Customizable:
 
 Fixed:
 - Log must include date, scope, and result counts at minimum
-- File path is .ai/reviews/review-log.md (configurable via config.yaml)
+- File path is .lattice/reviews/review-log.md (configurable via config.yaml)
 - Log is append-only (no overwriting)
 
 Cross-section impact:
@@ -509,7 +509,7 @@ Cross-section impact:
 
 ### File Location
 
-Append to `.ai/reviews/review-log.md`. Create the file with a `# Review Log` heading if it doesn't exist.
+Append to `.lattice/reviews/review-log.md`. Create the file with a `# Review Log` heading if it doesn't exist.
 
 ### Entry Format
 

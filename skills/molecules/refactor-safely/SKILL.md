@@ -17,14 +17,14 @@ Load and apply these skills based on the refactor's scope (see Steps 3, 5, and 6
 6. `framework:design-first` -- Use progressive design selectively for significant structural changes so the target structure is agreed before editing code (conditional)
 7. `framework:architecture` -- Validate layer placement, dependency direction, and correct structural boundaries (conditional)
 8. `framework:domain-driven-design` -- Validate domain behavior, aggregate boundaries, and movement of business rules into the correct domain objects (conditional)
-   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
+   → Skip if `disable.domain_driven_design: true` in `.lattice/config.yaml`
 9. `framework:secure-coding` -- Preserve validation, authorization, trust-boundary protections, and safe data handling when the refactor touches security-sensitive code (conditional)
 
 ## Workflow
 
 ### Disable Check
 
-Read `.ai/config.yaml`. If `disable.domain_driven_design: true` → skip `framework:domain-driven-design` for the entire workflow. No replacement atom.
+Read `.lattice/config.yaml`. If `disable.domain_driven_design: true` → skip `framework:domain-driven-design` for the entire workflow. No replacement atom.
 
 ### Step 1: Establish Refactor Context
 
@@ -33,7 +33,7 @@ Start from the **current pain**, not from a preferred abstraction.
 - Identify the target area: module, service, aggregate, endpoint path, or subsystem
 - Clarify **why** the refactor is needed: mixed responsibilities, duplication, wrong-layer logic, coupling, poor testability, or unreadable control flow
 - Clarify what the user expects to improve: simpler structure, correct layer placement, smaller units, clearer domain behavior, easier testing, or safer extension points
-- If `.ai/learnings/review-insights.md` exists, read it. Recurring review findings often identify exactly which structural mistakes should be corrected
+- If `.lattice/learnings/review-insights.md` exists, read it. Recurring review findings often identify exactly which structural mistakes should be corrected
 - Use `framework:context-anchoring` Document Discovery to check for an existing context document for the affected feature or module
   - **If found** → Load it (context-anchoring Load behavior). Honor existing decisions and constraints as active commitments while planning the refactor
   - **If not found** → Proceed from the conversation and current code. Do not block planning on missing context

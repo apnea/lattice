@@ -1,6 +1,6 @@
 # Architecture Refiner Template
 
-This template defines the structure of the `.ai/standards/architecture.md` output document for clean architecture style. It contains all default content from the architecture atom's `clean-architecture-defaults.md`, interleaved with interview guidance comments.
+This template defines the structure of the `.lattice/standards/architecture.md` output document for clean architecture style. It contains all default content from the architecture atom's `clean-architecture-defaults.md`, interleaved with interview guidance comments.
 
 When producing the output, strip all `<!-- INTERVIEW GUIDANCE: -->` comments. The final document is a specification, not a conversation log.
 

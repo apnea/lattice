@@ -13,9 +13,9 @@ This is not about how to write good code -- that is handled by the `clean-code` 
 
 ## What This Produces
 
-- **Output**: `.ai/standards/knowledge-base.md` (or custom path from `.ai/config.yaml` -> `paths.knowledge_base`)
+- **Output**: `.lattice/standards/knowledge-base.md` (or custom path from `.lattice/config.yaml` -> `paths.knowledge_base`)
 - **Mode**: Override is the standard approach -- every project's knowledge base is unique, so there are no generic defaults to overlay on. Overlay mode is available for selective revisions of an existing document.
-- **Config key**: `paths.knowledge_base` in `.ai/config.yaml`
+- **Config key**: `paths.knowledge_base` in `.lattice/config.yaml`
 - **Template**: Read `./assets/template.md` for the full document structure and interview guidance comments
 - **Consumed by**: The `knowledge-priming` atom loads this document via config resolution and provides it as ambient project context to all skills and molecules
 
@@ -38,7 +38,7 @@ If you find yourself writing content that teaches *how to write code*, it belong
 
 Before starting the interview:
 
-1. Read `.ai/config.yaml` -- does `paths.knowledge_base` point to a file?
+1. Read `.lattice/config.yaml` -- does `paths.knowledge_base` point to a file?
 2. If yes, read that file. Ask the user:
    - "You already have a knowledge base document. Would you like to **revise** it (update specific sections), **start fresh** (new interview), or **add to it**?"
    - Revise: Load the existing document, walk through only the sections the user wants to change.
@@ -95,11 +95,11 @@ Read `./assets/template.md` and follow the `<!-- INTERVIEW GUIDANCE: -->` commen
 5. Strip all `<!-- INTERVIEW GUIDANCE: -->` comments from the output
 
 **Determine output path:**
-1. If `.ai/config.yaml` exists and has `paths.knowledge_base`, use that path.
-2. Otherwise, default to `.ai/standards/knowledge-base.md`.
+1. If `.lattice/config.yaml` exists and has `paths.knowledge_base`, use that path.
+2. Otherwise, default to `.lattice/standards/knowledge-base.md`.
 
 **Update config:**
-1. If `.ai/config.yaml` does not exist, create it with `paths.knowledge_base` pointing to the output file.
+1. If `.lattice/config.yaml` does not exist, create it with `paths.knowledge_base` pointing to the output file.
 2. If it exists but lacks the key, add it. Preserve existing content.
 
 ## Document Quality Checks

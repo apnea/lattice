@@ -14,7 +14,7 @@ Load and apply these skills based on the scope of the review (see Step 2 for con
 3. `framework:clean-code` -- Code craft validation: SRP, naming, complexity, error handling (always loaded)
 4. `framework:architecture` -- Structural validation: layer rules, dependency direction, architectural flows (conditional)
 5. `framework:domain-driven-design` -- Domain modeling validation: aggregates, entities, value objects (conditional)
-   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
+   → Skip if `disable.domain_driven_design: true` in `.lattice/config.yaml`
 6. `framework:secure-coding` -- Security validation: trust boundaries, injection, secrets, input handling (conditional)
 7. `framework:test-quality` -- Test validation: AAA structure, isolation, assertions, naming (conditional)
 
@@ -24,7 +24,7 @@ The review molecule supports optional process configuration through a review-sta
 
 **Resolution steps:**
 
-1. Look for `.ai/config.yaml` in the repository root.
+1. Look for `.lattice/config.yaml` in the repository root.
 2. Check for the config key `paths.review_standards`.
 3. If a document exists at that path, read it and check its YAML frontmatter for `mode`:
    - **`mode: overlay`**: Read the embedded defaults in this workflow first, then apply the document's sections on top. Sections are matched by heading — custom sections replace matching defaults, new sections are appended.
@@ -49,7 +49,7 @@ Each step below notes where config applies with "**Config override**" callouts. 
 
 ### Disable Check
 
-Read `.ai/config.yaml`. If `disable.domain_driven_design: true` → skip `framework:domain-driven-design` for the entire workflow. No replacement atom. Do not load it in Step 2, do not run its checks in Step 3, and do not include it in the report in Step 4.
+Read `.lattice/config.yaml`. If `disable.domain_driven_design: true` → skip `framework:domain-driven-design` for the entire workflow. No replacement atom. Do not load it in Step 2, do not run its checks in Step 3, and do not include it in the report in Step 4.
 
 ### Step 1: Identify the Delta
 
@@ -176,21 +176,21 @@ After all atom sections, add:
 
 After presenting the report to the user, capture learnings and log the review for project health visibility.
 
-**Capture Insights** — append to `.ai/learnings/review-insights.md`:
+**Capture Insights** — append to `.lattice/learnings/review-insights.md`:
 
 If recurring patterns or notable findings emerged from this review:
 
-1. Create `.ai/learnings/` directory if it doesn't exist.
-2. Before appending, check for an existing entry describing the same pattern — update it with a recurrence note rather than adding a new entry. Append new concise bullet points to `.ai/learnings/review-insights.md`. Create the file with a `# Review Insights` heading if it doesn't exist.
+1. Create `.lattice/learnings/` directory if it doesn't exist.
+2. Before appending, check for an existing entry describing the same pattern — update it with a recurrence note rather than adding a new entry. Append new concise bullet points to `.lattice/learnings/review-insights.md`. Create the file with a `# Review Insights` heading if it doesn't exist.
 3. Format: `- YYYY-MM-DD [Feature]: Pattern observed — actionable takeaway`
 4. Each insight is ONE bullet point, max 2 lines. Keep entries concise — bullet points that help AI remember patterns, not verbose reports. Each entry should be scannable in under 10 seconds.
 5. Only capture patterns that would help future code generation — not every finding. A one-off typo is not an insight; "domain services keep doing repository work" is.
 6. If the file exceeds ~50 entries, suggest pruning oldest entries that haven't recurred in recent reviews.
 
-**Log Review** — append to `.ai/reviews/review-log.md`:
+**Log Review** — append to `.lattice/reviews/review-log.md`:
 
-1. Create `.ai/reviews/` directory if it doesn't exist.
-2. Append a structured summary to `.ai/reviews/review-log.md`. Create the file with a `# Review Log` heading if it doesn't exist.
+1. Create `.lattice/reviews/` directory if it doesn't exist.
+2. Append a structured summary to `.lattice/reviews/review-log.md`. Create the file with a `# Review Log` heading if it doesn't exist.
 3. Format — keep each entry under 8 lines:
 
 ```

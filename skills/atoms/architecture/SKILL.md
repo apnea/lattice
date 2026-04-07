@@ -11,7 +11,7 @@ This skill supports two architecture modes: **clean architecture** (default) and
 
 **Step 1 — Determine the mode:**
 
-1. Read `.ai/config.yaml` in the repository root
+1. Read `.lattice/config.yaml` in the repository root
 2. Check the `architecture_mode` key
    - If `architecture_mode: custom` → **custom mode**
    - If absent, or any other value → **clean architecture mode** (default)
@@ -24,14 +24,14 @@ This skill supports two architecture modes: **clean architecture** (default) and
 **Step 3 — Load architecture content:**
 
 - **Clean architecture mode:**
-  1. Check `paths.architecture` in `.ai/config.yaml` for a custom document
+  1. Check `paths.architecture` in `.lattice/config.yaml` for a custom document
   2. If found, read the document and check its YAML frontmatter for `mode`:
      - **`mode: overlay`**: Read `./references/clean-architecture-defaults.md` first, then apply the custom document's sections on top. Sections are matched by heading — custom sections replace matching defaults, new sections are appended.
      - **`mode: override`**: The custom document takes full precedence. It must be comprehensive.
   3. If no custom document → read `./references/clean-architecture-defaults.md`
 
 - **Custom mode:**
-  1. Check `paths.architecture` in `.ai/config.yaml` for the team's architecture document
+  1. Check `paths.architecture` in `.lattice/config.yaml` for the team's architecture document
   2. If found → read it. It is the sole reference — there are no defaults.
   3. If not found → surface: "No architecture document found. Run `/architecture-refiner` and select your architecture style to define your team's standards."
 

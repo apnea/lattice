@@ -13,7 +13,7 @@ This atom does not teach coding principles (that is clean-code), structural rule
 
 ## Config Resolution
 
-1. Look for `.ai/config.yaml` in the repository root
+1. Look for `.lattice/config.yaml` in the repository root
 2. If found, check `paths.knowledge_base` for a custom document path
 3. If a document exists at that path, read it and apply it as ambient project context
 4. If no config, no path, or no document found -- see "When No Document Exists" below
@@ -28,7 +28,7 @@ If no knowledge base document is found during config resolution, inform the user
 >
 > To create one, trigger the **knowledge-priming-refiner** skill -- a guided interview (~10 questions) that produces a concise document (~50 lines). Once created, every Lattice skill will use it as ambient context.
 >
-> You can also create `.ai/standards/knowledge-base.md` manually and reference it in `.ai/config.yaml` under `paths.knowledge_base`.
+> You can also create `.lattice/standards/knowledge-base.md` manually and reference it in `.lattice/config.yaml` under `paths.knowledge_base`.
 
 This message is informational, not blocking. All skills continue to function without a knowledge base -- they just operate without project-specific context.
 

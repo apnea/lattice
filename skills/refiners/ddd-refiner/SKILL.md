@@ -7,12 +7,12 @@ description: "Facilitate a structured conversation to define DDD guardrails for 
 
 ## What This Produces
 
-- **Output**: `.ai/standards/ddd-principles.md` (or custom path from `.ai/config.yaml` → `paths.ddd_principles`)
+- **Output**: `.lattice/standards/ddd-principles.md` (or custom path from `.lattice/config.yaml` → `paths.ddd_principles`)
 - **Two modes**:
   - **Overlay** (`mode: overlay`): A slim document containing only sections that differ from the defaults. The domain-driven-design atom reads its embedded defaults first, then applies this document's sections on top. This is the expected common case.
   - **Override** (`mode: override`): A comprehensive standalone document that fully replaces the atom's embedded defaults. For teams with fundamentally different domain modeling principles.
 - **Default mode**: Overlay -- produces only what the user wants to change
-- **Config key**: `paths.ddd_principles` in `.ai/config.yaml`
+- **Config key**: `paths.ddd_principles` in `.lattice/config.yaml`
 - **Template**: Read `./assets/template.md` for the full document structure, default content, and interview guidance comments
 
 ## Scope Clarification
@@ -25,7 +25,7 @@ This skill defines the *rules of domain crafting*, not the domain model itself. 
 
 Before starting the interview, check whether a custom document already exists:
 
-1. Read `.ai/config.yaml` -- does `paths.ddd_principles` point to a file?
+1. Read `.lattice/config.yaml` -- does `paths.ddd_principles` point to a file?
 2. If yes, read that file. Ask the user:
    - "You already have a custom DDD principles document. Would you like to **revise** it (update specific sections), **start fresh** (new interview), or **add to it** (add new sections)?"
    - Revise: Load the existing document, walk through only the sections the user wants to change, and update in place.
@@ -167,21 +167,21 @@ For each of the 10 default sections:
 Strip all `<!-- INTERVIEW GUIDANCE: -->` comments from the output. The final document is a clean specification.
 
 **Determine output path:**
-1. If `.ai/config.yaml` exists and has `paths.ddd_principles`, use that path.
-2. Otherwise, default to `.ai/standards/ddd-principles.md`.
+1. If `.lattice/config.yaml` exists and has `paths.ddd_principles`, use that path.
+2. Otherwise, default to `.lattice/standards/ddd-principles.md`.
 
 **Write the document:**
-1. Create `.ai/standards/` directory (and `.ai/` parent) if it does not exist.
+1. Create `.lattice/standards/` directory (and `.lattice/` parent) if it does not exist.
 2. Write the document to the determined path.
 
 **Update config:**
-1. If `.ai/config.yaml` does not exist, create it with:
+1. If `.lattice/config.yaml` does not exist, create it with:
    ```yaml
    paths:
-     ddd_principles: .ai/standards/ddd-principles.md
+     ddd_principles: .lattice/standards/ddd-principles.md
    ```
-2. If `.ai/config.yaml` exists but has no `paths.ddd_principles`, add the key. Preserve all existing content.
-3. If `.ai/config.yaml` exists and already has the key, no config change needed.
+2. If `.lattice/config.yaml` exists but has no `paths.ddd_principles`, add the key. Preserve all existing content.
+3. If `.lattice/config.yaml` exists and already has the key, no config change needed.
 
 **Confirm to user:**
 "Your DDD principles document has been written to `[PATH]` in **[overlay|override]** mode. The domain-driven-design atom will now use it [on top of the defaults | instead of the defaults]."
@@ -213,5 +213,5 @@ Before writing the final document, verify:
 
 - [ ] Frontmatter is valid YAML with correct mode value
 - [ ] Document is well-formatted markdown
-- [ ] Config file (`.ai/config.yaml`) is correctly updated
+- [ ] Config file (`.lattice/config.yaml`) is correctly updated
 - [ ] Output path exists and is writable

@@ -16,21 +16,21 @@ Load and apply these skills based on the bug's scope (see Steps 2 and 5 for cond
 5. `framework:test-quality` -- Create and validate the failing regression test that proves the bug exists and the fix works (always loaded)
 6. `framework:architecture` -- Validate layer placement, dependency direction, and correct repair location (conditional)
 7. `framework:domain-driven-design` -- Validate invariants, aggregate boundaries, and domain behavior when the bug involves domain logic (conditional)
-   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
+   → Skip if `disable.domain_driven_design: true` in `.lattice/config.yaml`
 8. `framework:secure-coding` -- Validate trust boundaries, input handling, authorization, and injection safety when the bug touches security-sensitive code (conditional)
 
 ## Workflow
 
 ### Disable Check
 
-Read `.ai/config.yaml`. If `disable.domain_driven_design: true` → skip `framework:domain-driven-design` for the entire workflow. No replacement atom.
+Read `.lattice/config.yaml`. If `disable.domain_driven_design: true` → skip `framework:domain-driven-design` for the entire workflow. No replacement atom.
 
 ### Step 1: Establish Bug Context
 
 Start from the failure, not from a proposed fix.
 
 - Gather the **observed behavior**, **expected behavior**, **reproduction path**, and any available evidence: failing test, error message, stack trace, log excerpt, request payload, or recent change.
-- If `.ai/learnings/review-insights.md` exists, read it. Recurring review patterns often point directly to likely defect classes.
+- If `.lattice/learnings/review-insights.md` exists, read it. Recurring review patterns often point directly to likely defect classes.
 - Use `framework:context-anchoring` Document Discovery to check for an existing context document for the affected feature or module.
   - **If found** → Load it (context-anchoring Load behavior). Honor logged decisions and constraints as active commitments while diagnosing the issue.
   - **If not found** → Proceed from the bug report and current code. Do not block diagnosis on missing context.

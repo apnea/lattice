@@ -15,7 +15,7 @@ Read and apply these skills:
 4. `framework:architecture` -- Layer placement, dependency direction, structural validation (always)
 5. `framework:clean-code` -- Code craft guardrails: SRP, naming, complexity, error handling (always)
 6. `framework:domain-driven-design` -- Aggregates, entities, value objects, domain services (conditional: only when touching domain folder)
-   → Skip if `disable.domain_driven_design: true` in `.ai/config.yaml`
+   → Skip if `disable.domain_driven_design: true` in `.lattice/config.yaml`
 7. `framework:secure-coding` -- Trust boundaries, injection prevention, secrets management (conditional: only for boundary-crossing code)
 8. `framework:test-quality` -- AAA structure, isolation, assertion quality, naming (always when writing tests)
 
@@ -23,11 +23,11 @@ Read and apply these skills:
 
 ### Disable Check
 
-Read `.ai/config.yaml`. If `disable.domain_driven_design: true` → skip `framework:domain-driven-design` for the entire workflow. No replacement atom.
+Read `.lattice/config.yaml`. If `disable.domain_driven_design: true` → skip `framework:domain-driven-design` for the entire workflow. No replacement atom.
 
 ### Step 1: Establish Implementation Context
 
-**Load learnings**: If `.ai/learnings/review-insights.md` exists, read it. Use recent insights to inform generation — e.g., if learnings say "anemic domain models keep appearing," actively push behavior into entities. If learnings flag "missing input validation on value objects," validate in constructors from the start. These are patterns from past reviews — use them to avoid repeating the same mistakes.
+**Load learnings**: If `.lattice/learnings/review-insights.md` exists, read it. Use recent insights to inform generation — e.g., if learnings say "anemic domain models keep appearing," actively push behavior into entities. If learnings flag "missing input validation on value objects," validate in constructors from the start. These are patterns from past reviews — use them to avoid repeating the same mistakes.
 
 Use `framework:context-anchoring` Document Discovery to check for an existing context anchor document for the feature being implemented.
 
@@ -106,7 +106,7 @@ This step checks **architectural coherence** -- not code quality (that was verif
 - **Dependency direction**: Apply `framework:architecture` verification across all components — verify that inter-component dependency direction follows the loaded architecture rules. No layer should import from a layer it is not permitted to depend on.
 - **Zero Implementation Rule**: Check that no new components, interactions, or contracts were introduced beyond what was planned in Step 2. If something was added, flag it -- it may be necessary, but it should be a conscious decision, not scope creep.
 - **Final security scan**: Apply `framework:secure-coding` across component boundaries. Check that data flowing between components crosses trust boundaries safely.
-- **Learnings check**: If `.ai/learnings/review-insights.md` was loaded in Step 1, verify that previously-flagged patterns do not recur in this implementation. If a past insight said "anemic domain models keep appearing" -- check that entities in this implementation have behavior.
+- **Learnings check**: If `.lattice/learnings/review-insights.md` was loaded in Step 1, verify that previously-flagged patterns do not recur in this implementation. If a past insight said "anemic domain models keep appearing" -- check that entities in this implementation have behavior.
 
 ### Step 5: Enrich Context
 
