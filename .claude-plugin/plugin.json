@@ -1,0 +1,17 @@
+{
+  "name": "lattice",
+  "version": "1.0.0",
+  "description": "Composable AI skills framework covering the full software delivery lifecycle — design, architecture, implementation, testing, and review.",
+  "author": {
+    "name": "Rahul Garg"
+  },
+  "homepage": "https://github.com/techygarg/lattice",
+  "repository": "https://github.com/techygarg/lattice",
+  "license": "MIT",
+  "keywords": ["skills", "sdlc", "clean-code", "architecture", "ddd", "ai-workflow"],
+  "skills": [
+    "./skills/atoms/",
+    "./skills/molecules/",
+    "./skills/refiners/"
+  ]
+}
