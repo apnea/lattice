@@ -12,14 +12,15 @@ Copies all Lattice skills into <target-skills-dir>, flattening the
 atoms/molecules/refiners structure so your AI tool can discover them.
 
 The target is the skills directory of your AI tool, for example:
-  Claude Code:  ~/.claude/skills/  or  /path/to/project/.claude/skills/
-  Cursor:       /path/to/project/.cursor/skills/
-  Any other:    /absolute/path/to/your/skills/folder/
+  opencode (global):   ~/.config/opencode/skills/lattice
+  opencode (project):  /path/to/project/.opencode/skills/lattice
+  Claude Code:         ~/.claude/skills/
+  Any other:           /absolute/path/to/your/skills/folder/
 
 Examples:
+  ./tools/install.sh ~/.config/opencode/skills/lattice
+  ./tools/install.sh /path/to/my-app/.opencode/skills/lattice
   ./tools/install.sh ~/.claude/skills
-  ./tools/install.sh /path/to/my-app/.claude/skills
-  ./tools/install.sh /path/to/my-app/.cursor/skills
 EOF
   exit 1
 }

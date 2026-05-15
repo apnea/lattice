@@ -1,0 +1,38 @@
+{
+  "name": "opencode-lattice",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Lattice skill framework plugin for opencode — resolves framework:xxx references and registers slash commands",
+  "author": "Lattice",
+  "license": "MIT",
+  "main": "./index.ts",
+  "exports": {
+    "./server": "./index.ts",
+    "./tui": "./tui.ts"
+  },
+  "files": [
+    "index.ts",
+    "tui.ts",
+    "skills.ts"
+  ],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "lattice",
+    "skills",
+    "ai",
+    "coding"
+  ],
+  "opencode": {
+    "requires": ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nichochar/lattice.git",
+    "directory": "tools/opencode-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/nichochar/lattice/issues"
+  },
+  "homepage": "https://github.com/nichochar/lattice#readme"
+}

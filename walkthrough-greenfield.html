@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lattice — Greenfield Walkthrough (LinkStash)</title>
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b22;
+    --surface2: #1c2129;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-dim: #1f3a5f;
+    --green: #3fb950;
+    --green-dim: #1a3a2a;
+    --yellow: #d29922;
+    --yellow-dim: #3a2f1a;
+    --purple: #bc8cff;
+    --purple-dim: #2d1f4e;
+    --red: #f85149;
+    --orange: #f0883e;
+    --orange-dim: #3a2a1a;
+    --user-bg: #172a3a;
+    --ai-bg: #1c2129;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .header {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header h1 { font-size: 1.4rem; font-weight: 600; }
+  .header .subtitle { color: var(--text-dim); margin-top: 0.25rem; font-size: 0.85rem; }
+  .header .badge {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.2rem 0.6rem;
+    background: var(--orange-dim);
+    color: var(--orange);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pipeline-nav {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 0.6rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    position: sticky;
+    top: 72px;
+    z-index: 99;
+  }
+  .pipeline-step {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pipeline-step:hover { color: var(--text); background: var(--surface2); }
+  .pipeline-step.active { color: var(--accent); background: var(--accent-dim); }
+  .pipeline-arrow { color: var(--border); display: flex; align-items: center; font-size: 0.65rem; }
+
+  .controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    max-width: 820px;
+    margin: 1rem auto 0;
+    padding: 0 1rem;
+  }
+  .controls button {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .controls button:hover { color: var(--text); border-color: var(--accent); }
+
+  .content { max-width: 820px; margin: 0 auto; padding: 1rem; }
+
+  .stage {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.25rem;
+    background: var(--surface);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .stage-header:hover { background: var(--surface2); }
+  .stage-number {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+  }
+  .stage-number.init { background: var(--yellow-dim); color: var(--yellow); }
+  .stage-number.req { background: var(--accent-dim); color: var(--accent); }
+  .stage-number.des { background: var(--green-dim); color: var(--green); }
+  .stage-number.code { background: var(--purple-dim); color: var(--purple); }
+  .stage-number.rev { background: #3a1a1a; color: var(--red); }
+  .stage-number.result { background: var(--orange-dim); color: var(--orange); }
+  .stage-title { font-weight: 600; font-size: 0.92rem; }
+  .stage-subtitle { color: var(--text-dim); font-size: 0.78rem; margin-left: auto; }
+  .stage-chevron { color: var(--text-dim); transition: transform 0.2s; font-size: 0.75rem; }
+  .stage.open .stage-chevron { transform: rotate(90deg); }
+  .stage-body { display: none; padding: 0; border-top: 1px solid var(--border); }
+  .stage.open .stage-body { display: block; }
+
+  .exchange { padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--border); }
+  .exchange:last-child { border-bottom: none; }
+
+  .msg { margin-bottom: 0.7rem; padding: 0.7rem 1rem; border-radius: 8px; font-size: 0.86rem; white-space: pre-wrap; word-wrap: break-word; }
+  .msg:last-child { margin-bottom: 0; }
+  .msg-user { background: var(--user-bg); border: 1px solid #1f3a5f; margin-left: 2rem; }
+  .msg-ai { background: var(--ai-bg); border: 1px solid var(--border); margin-right: 2rem; }
+  .msg-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+  .msg-user .msg-label { color: var(--accent); }
+  .msg-ai .msg-label { color: var(--green); }
+
+  .hoodie { margin: 0.7rem 0 0.2rem 0; border: 1px dashed var(--border); border-radius: 6px; overflow: hidden; }
+  .hoodie-header {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.35rem 0.75rem; background: var(--surface);
+    cursor: pointer; font-size: 0.72rem; color: var(--text-dim);
+  }
+  .hoodie-header:hover { color: var(--text); }
+  .hoodie-chevron { font-size: 0.6rem; transition: transform 0.2s; }
+  .hoodie.open .hoodie-chevron { transform: rotate(90deg); }
+  .hoodie-body {
+    display: none; padding: 0.55rem 0.75rem;
+    font-size: 0.78rem; color: var(--text-dim); line-height: 1.55;
+    background: rgba(139,148,158,0.05);
+  }
+  .hoodie.open .hoodie-body { display: block; }
+
+  .folder-tree {
+    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.8rem; line-height: 1.75; padding: 0.9rem;
+    background: var(--surface); border-radius: 6px;
+    margin: 0.5rem 0; color: var(--text-dim);
+  }
+  .folder-tree .created { color: var(--green); }
+  .folder-tree .note { color: var(--yellow); font-family: inherit; }
+  .folder-tree .newdir { color: var(--accent); }
+
+  .divider {
+    text-align: center; padding: 0.4rem; font-size: 0.7rem;
+    color: var(--text-dim); background: rgba(139,148,158,0.03);
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    font-style: italic; margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .msg-user { margin-left: 0; }
+    .msg-ai { margin-right: 0; }
+    .stage-subtitle { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lattice Greenfield Walkthrough</h1>
+  <div class="subtitle">Building "LinkStash" from nothing — Python, FastAPI, hexagonal architecture</div>
+  <div class="badge">Starting from scratch — no existing code</div>
+</div>
+
+<div class="pipeline-nav" id="pipelineNav">
+  <div class="pipeline-step" onclick="goStage(0)">0 · Init</div>
+  <div class="pipeline-arrow">&#9656;</div>
+  <div class="pipeline-step" onclick="goStage(1)">1 · Requirements</div>
+  <div class="pipeline-arrow">&#9656;</div>
+  <div class="pipeline-step" onclick="goStage(2)">2 · Design</div>
+  <div class="pipeline-arrow">&#9656;</div>
+  <div class="pipeline-step" onclick="goStage(3)">3 · Implement</div>
+  <div class="pipeline-arrow">&#9656;</div>
+  <div class="pipeline-step" onclick="goStage(4)">4 · Review</div>
+  <div class="pipeline-arrow">&#9656;</div>
+  <div class="pipeline-step" onclick="goStage(5)">5 · Result</div>
+</div>
+
+<div class="controls">
+  <button onclick="toggleAll(true)">Expand all</button>
+  <button onclick="toggleAll(false)">Collapse all</button>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- STAGE 0: INIT (GREENFIELD) -->
+<!-- ═══════════════════════════════════════ -->
+<div class="stage" id="stage-0">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number init">0</div>
+    <div class="stage-title">lattice-init</div>
+    <div class="stage-subtitle">Empty directory — define everything from zero</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/lattice-init</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>I scanned your project. Here's what I found:
+
+<span style="color:var(--text)">Detected:</span> Nothing — this is an empty directory.
+<span style="color:var(--text)">Structure:</span> No source files, no configuration, no tests.
+<span style="color:var(--text)">Lattice status:</span>
+<span style="color:var(--red)">✗</span> No .lattice/ folder — fresh setup on a fresh project.
+
+Since there's nothing to infer from, I need to ask more than usual.
+The refiners will be your foundation — they define the rules that
+every future feature will follow.
+
+Recommended order:
+
+  1. /knowledge-priming-refiner  (what are we building, in what?)
+  2. /architecture-refiner       (how is the code organized?)
+  3. /language-idioms-refiner    (Python-specific patterns)
+  4. /clean-code-refiner         (team coding standards)
+
+<span style="color:var(--accent)">[Run all four] [Run #1 first] [Skip — use generic defaults]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Run all four</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Starting with knowledge-priming-refiner.
+
+What are you building? (One sentence is fine — we'll refine later.)</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>A bookmark management service. Users save links, organize them with tags and collections, and search through them.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Got it. Language and framework?
+<span style="color:var(--accent)">[Python / FastAPI] [Python / Django] [TypeScript / Express] [Other]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Python / FastAPI</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Database?
+<span style="color:var(--accent)">[PostgreSQL] [SQLite] [MySQL] [Other]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>PostgreSQL</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>ORM or raw SQL?
+<span style="color:var(--accent)">[SQLAlchemy] [Tortoise ORM] [SQLModel] [Raw SQL]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>SQLAlchemy</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Testing?
+<span style="color:var(--accent)">[pytest] [unittest] [Other]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>pytest</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Your project identity:
+
+  Product:    LinkStash — bookmark management service
+  Language:   Python 3.12
+  Framework:  FastAPI
+  DB:         PostgreSQL via SQLAlchemy
+  Test:       pytest + httpx (async test client)
+  DI:         FastAPI's built-in dependency injection
+
+Writing .lattice/standards/knowledge-base.md ... done.
+
+Now running architecture-refiner...
+
+No existing code to scan. Let's define your architecture from scratch.
+
+What architecture style does your team use?
+
+  1. <span style="color:var(--text)">Clean Architecture</span> — layers, dependency inversion, command/query separation
+  2. <span style="color:var(--text)">Hexagonal / Ports &amp; Adapters</span> — core domain surrounded by ports, adapters on the outside
+  3. <span style="color:var(--text)">Modular Monolith</span> — vertical slices, each module owns its own layers
+  4. <span style="color:var(--text)">Custom</span> — define from scratch</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Hexagonal — I like the ports and adapters approach.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Hexagonal it is. I'll use the generic architecture flow for this style.
+
+Let's define the core structure. In hexagonal architecture:
+
+  <span style="color:var(--text)">Domain</span> sits in the center — pure Python, no framework, no I/O.
+  <span style="color:var(--text)">Ports</span> are abstract interfaces the domain defines (what it needs from the outside).
+  <span style="color:var(--text)">Adapters</span> implement those ports (DB, HTTP, email, etc.).
+
+Proposed folder structure:
+
+  src/
+  └── linkstash/
+      ├── domain/          ← entities, value objects, domain services
+      ├── ports/           ← abstract interfaces (inbound + outbound)
+      │   ├── inbound/     ← what the outside can call (use case interfaces)
+      │   └── outbound/    ← what the domain needs (repo interfaces, etc.)
+      ├── adapters/
+      │   ├── inbound/     ← FastAPI controllers, CLI commands
+      │   └── outbound/    ← SQLAlchemy repos, SMTP email, HTTP clients
+      └── config/          ← app wiring, DI container
+
+Dependency rule: everything points inward. Adapters depend on ports.
+Ports depend on domain. Domain depends on nothing.
+
+Does this structure match your thinking?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Yeah, that looks right. One thing — I want the inbound port interfaces to be use case classes, not just bare functions.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Noted — use case classes in ports/inbound/, each with an execute() method.
+
+Dependency direction:
+  adapters/inbound → ports/inbound → domain
+  adapters/outbound → ports/outbound → domain
+  adapters never depend on other adapters
+
+Writing .lattice/standards/architecture.md (override mode — hexagonal has no embedded defaults to overlay) ...
+Updated .lattice/config.yaml:
+  paths.architecture: .lattice/standards/architecture.md
+  architecture_mode: custom
+
+Now running language-idioms-refiner...
+
+I'll ask Python-specific questions that the atoms will reference.
+
+Error handling — what pattern do you prefer?
+  <span style="color:var(--accent)">[Exceptions (raise/try-except)]
+  [Result types (Returns library)]
+  [Exceptions for unexpected, Result for expected failures]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Exceptions for unexpected, Result for expected failures.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Noted — dual error strategy. Domain use cases return Result objects
+for business-rule failures (e.g. "link already exists"). Infrastructure
+raises exceptions for unexpected errors (e.g. DB connection lost).
+
+Naming conventions?
+<span style="color:var(--accent)">[snake_case everywhere (PEP 8)]
+[snake_case for functions/variables, PascalCase for classes]
+[I have specific rules]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>snake_case for functions/variables, PascalCase for classes. Standard Python.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>DI pattern — FastAPI has built-in Depends(). Use it for everything?
+<span style="color:var(--accent)">[Yes — FastAPI Depends() for all injection]
+[Mix — Depends() for adapters, manual wiring for domain]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Yes — FastAPI Depends() for all injection.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Writing .lattice/standards/language-idioms.md ... done.
+This document will be read by clean-code, architecture, DDD, and test-quality atoms to adapt their defaults to Python.
+
+Now running clean-code-refiner...
+
+Defaults: SRP, &lt;20 line functions, cyclomatic &lt;10, no magic numbers, meaningful naming.
+<span style="color:var(--accent)">[Defaults are fine] [I have specific rules]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Defaults are fine.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>No custom clean-code document needed — embedded defaults active,
+adapted to Python via the language idioms document.
+
+<span style="color:var(--green)">Setup complete.</span> Your pipeline:
+
+  /requirement-forge → /design-blueprint → /code-forge → /review
+
+Ready when you are. Describe a feature to start, or run
+/requirement-forge to define the full product first.</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">lattice-init composed <b>knowledge-priming</b> — it scanned the directory and found nothing, so it couldn't infer any defaults. The refiners had to ask everything from scratch. The <b>architecture-refiner</b> used the generic flow (not the clean-architecture-specific flow) because hexagonal has no embedded defaults — the output document is in override mode. The <b>language-idioms-refiner</b> produced a document that atoms will read to adapt their pseudocode defaults to Python (e.g. Result types for error handling, snake_case naming, FastAPI Depends() for DI). Four artifacts written to .lattice/standards/.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- STAGE 1: REQUIREMENT FORGE (MULTI-EPIC) -->
+<!-- ═══════════════════════════════════════ -->
+<div class="stage" id="stage-1">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number req">1</div>
+    <div class="stage-title">requirement-forge</div>
+    <div class="stage-subtitle">Multi-epic discovery with session focus</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/requirement-forge</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Starting requirement-forge. Loading requirement-quality standards.
+
+Do you have existing requirements — PRDs, feature lists, notes?
+<span style="color:var(--accent)">[I have existing material] [Start from scratch]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Start from scratch. It's a bookmark management service called LinkStash.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Let me propose an epic structure for LinkStash.
+
+Based on "bookmark management with tags, collections, and search," I see five potential epics:
+
+  1. <span style="color:var(--text)">Link Management</span> — save, edit, delete, list bookmarks
+  2. <span style="color:var(--text)">Organization</span> — tags, collections, auto-tagging
+  3. <span style="color:var(--text)">Search &amp; Discovery</span> — full-text search, filters, sort
+  4. <span style="color:var(--text)">Import &amp; Export</span> — browser bookmark import, CSV/JSON export
+  5. <span style="color:var(--text)">Sharing &amp; Collaboration</span> — shared collections, public links
+
+<span style="color:var(--yellow)">⚠ This is a large product (5 epics). Spec'ing all of them in one session
+will be slow and exhausting. I recommend focusing on a subset.</span>
+
+Proposed session focus: <span style="color:var(--accent)">Epic 1 (Link Management)</span> as the core — everything else depends on links existing.
+
+Which epics do you want to spec in this session?
+<span style="color:var(--accent)">[Just Epic 1]
+[Epics 1 + 2]
+[All 5 — I have time]
+[I want to adjust the epics first]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Just Epic 1. We can come back for the others.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Focusing session on: <span style="color:var(--text)">Link Management</span>.
+
+Other epics will be noted in the index for future sessions.
+
+Feature breakdown for Link Management:
+
+  1. <span style="color:var(--text)">Save Link</span> — submit a URL, auto-fetch title and description
+  2. <span style="color:var(--text)">List Links</span> — paginated list, optionally filtered by date range
+  3. <span style="color:var(--text)">Get Link Detail</span> — view a single link with full metadata
+  4. <span style="color:var(--text)">Update Link</span> — edit title, description, URL
+  5. <span style="color:var(--text)">Delete Link</span> — soft delete with confirmation
+  6. <span style="color:var(--text)">Duplicate Detection</span> — warn when saving a URL that already exists
+
+Anything that's actually a technical task, not a user-facing feature?
+Anything missing?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>#6 is a behavior of #1, not a separate feature. Fold it in.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Good catch. Revised:
+
+  1. <span style="color:var(--text)">Save Link</span> (includes duplicate detection)
+  2. <span style="color:var(--text)">List Links</span>
+  3. <span style="color:var(--text)">Get Link Detail</span>
+  4. <span style="color:var(--text)">Update Link</span>
+  5. <span style="color:var(--text)">Delete Link</span>
+
+Starting Feature 1: <span style="color:var(--text)">Save Link</span>.
+
+<span style="color:var(--text)">Frame:</span>
+  Problem:      Users need to save URLs for later reference.
+  Dependencies: None — this is the first feature.
+  In scope:     URL submission, title/description fetch, duplicate detection.
+  Out of scope: Tags, collections, sharing.
+  Boundary:     What makes a URL "duplicate" — exact string match, or
+                normalized (strip trailing slash, lowercase host)?
+
+<span style="color:var(--accent)">[Exact match — simple, predictable]
+[Normalized — smarter but more edge cases]
+[Exact for now, normalize later]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Normalized. Users will paste URLs with and without trailing slashes.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Noted — URL normalization before comparison. Now scenarios:
+
+<span style="color:var(--text)">Scenario 1: Save a new link</span>
+  Given no existing link for "https://example.com/article"
+  When the user saves that URL
+  Then a new link is created with auto-fetched title and description
+  And the response includes the link ID
+
+<span style="color:var(--text)">Scenario 2: Duplicate URL</span>
+  Given an existing link for "https://example.com/article"
+  When the user saves "https://example.com/article/" (trailing slash)
+  Then the response indicates a duplicate (409 Conflict)
+  And includes the existing link ID
+
+<span style="color:var(--text)">Scenario 3: Unreachable URL</span>
+  Given the user saves "https://nonexistent.invalid/page"
+  When the title fetch fails
+  Then the link is still saved with the raw URL as title
+  And metadata fetch is marked as "pending retry"
+
+<span style="color:var(--text)">Scenario 4: Malformed URL</span>
+  Given the user submits "not-a-url"
+  When the save is attempted
+  Then the request is rejected (400 Bad Request)
+
+Anything missing?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Looks good.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Implementation slices for Feature 1:
+
+  A. URL value object (domain) — normalization, validation
+  B. Link entity (domain) — the bookmark aggregate
+  C. SaveLink use case (port/inbound)
+  D. LinkRepository interface (port/outbound)
+  E. MetadataFetcher interface (port/outbound) — title/description fetch
+  F. SQLAlchemy link repository (adapter/outbound)
+  G. HTTP metadata fetcher (adapter/outbound)
+  H. POST /api/links endpoint (adapter/inbound)
+
+Requirement-quality checklist: ✓ all checks pass.
+Writing .lattice/requirements/features/save-link.md ... done.
+
+Speccing Feature 2: List Links...</div>
+    </div>
+
+    <div class="divider">Features 2-5 follow the same pattern — omitted for brevity</div>
+
+    <div class="exchange">
+      <div class="msg msg-ai"><div class="msg-label">AI</div>All 5 features specced for Epic 1 (Link Management).
+
+Writing .lattice/requirements/index.md ...
+
+  Epic 1: Link Management     — 5 features — <span style="color:var(--green)">spec'd this session</span>
+  Epic 2: Organization        — not yet spec'd
+  Epic 3: Search &amp; Discovery  — not yet spec'd
+  Epic 4: Import &amp; Export     — not yet spec'd
+  Epic 5: Sharing &amp; Collab    — not yet spec'd
+
+<span style="color:var(--green)">Requirements ready for Epic 1.</span> Next: /design-blueprint
+
+To spec more epics later, run /requirement-forge again — it will
+detect existing specs and offer to add to them.</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">requirement-forge composed <b>requirement-quality</b> (validated specs), <b>knowledge-priming</b> (knew this was Python + hexagonal + FastAPI), and <b>collaborative-judgment</b> (surfaced the URL normalization decision). The multi-epic trigger fired because the product had 5 epics — requirement-forge proposed session focus on the foundational epic (Link Management) and deferred the rest. The index.md notes which epics are spec'd so future sessions can resume. Session resume is a first-class feature: re-running /requirement-forge will detect existing specs and offer to continue.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- STAGE 2: DESIGN BLUEPRINT (HEXAGONAL) -->
+<!-- ═══════════════════════════════════════ -->
+<div class="stage" id="stage-2">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number des">2</div>
+    <div class="stage-title">design-blueprint</div>
+    <div class="stage-subtitle">5-level design with hexagonal ports &amp; adapters</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/design-blueprint</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Loading requirements from .lattice/requirements/ ...
+Loading architecture rules (hexagonal, ports &amp; adapters) ...
+
+Which feature to design?
+<span style="color:var(--accent)">[All 5 — design together] [One at a time]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>All 5 — design together</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Creating .lattice/context/link-management.md
+
+━━━ Level 1: Capabilities ━━━
+
+  C1.  Accept a URL and persist it as a bookmark
+  C2.  Auto-fetch page title and description from URL
+  C3.  Detect duplicate URLs (normalized comparison)
+  C4.  Validate URL format before saving
+  C5.  List saved links with pagination
+  C6.  Filter links by date range
+  C7.  Get a single link's full details
+  C8.  Update a link's title, description, or URL
+  C9.  Soft-delete a link with confirmation
+  C10. Restore a soft-deleted link
+
+Approve capabilities?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>C10 — restore wasn't in the requirements. Where did that come from?</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>You're right — Feature 5 specifies soft delete but not restore.
+C10 is my inference. I'll remove it.
+
+If you want restore later, it can be added as a new feature without
+changing the soft-delete design.
+
+Revised: C1–C9. Approve?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Approved.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Level 2: Components ━━━
+
+Applying hexagonal architecture rules:
+
+<span style="color:var(--green)">Domain (pure Python, zero external dependencies):</span>
+  • URL (value object) — normalized URL, validation, equality
+  • Link (entity / aggregate root) — id, url, title, description,
+    created_at, updated_at, deleted_at
+  • LinkId (value object) — UUID-based identity
+
+<span style="color:var(--accent)">Ports (abstract interfaces):</span>
+  Inbound (what the outside can call):
+  • SaveLinkUseCase — execute(url, title?, description?) → Result[Link]
+  • ListLinksUseCase — execute(page, per_page, date_from?, date_to?) → Result[PaginatedLinks]
+  • GetLinkUseCase — execute(link_id) → Result[Link]
+  • UpdateLinkUseCase — execute(link_id, title?, description?, url?) → Result[Link]
+  • DeleteLinkUseCase — execute(link_id) → Result[None]
+
+  Outbound (what the domain needs):
+  • LinkRepository — save(), find_by_id(), find_by_url(), list_paginated(), soft_delete()
+  • MetadataFetcher — fetch(url) → Result[PageMetadata]
+
+<span style="color:var(--yellow)">Adapters — Inbound (driving adapters):</span>
+  • LinksController (FastAPI router) — POST, GET, GET /:id, PATCH, DELETE
+
+<span style="color:var(--yellow)">Adapters — Outbound (driven adapters):</span>
+  • SqlAlchemyLinkRepository — implements LinkRepository
+  • HttpMetadataFetcher — implements MetadataFetcher (httpx)
+
+DDD checks:
+  • URL is value object (immutable, equality by normalized value) ✓
+  • Link is aggregate root (owns its lifecycle) ✓
+  • No framework imports in domain ✓
+
+Approve components?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Why is MetadataFetcher in outbound ports? The metadata fetch is an infrastructure detail — the use case could just do it internally.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Judgment call — two valid approaches:
+
+<span style="color:var(--text)">Option A: Separate port (recommended)</span>
+  MetadataFetcher as an outbound port keeps HTTP I/O out of the domain.
+  The use case calls fetcher.fetch(url) — it doesn't know or care
+  whether that's an HTTP call, a cached result, or a test double.
+  Testable in isolation without mocking httpx.
+
+<span style="color:var(--text)">Option B: Inline in use case</span>
+  The use case directly calls httpx. Simpler for now.
+  Tradeoff: use case now depends on httpx (framework coupling),
+  harder to test without network, violates the dependency rule
+  (domain-aware code reaching into infrastructure).
+
+Given hexagonal's core principle — domain has zero external dependencies —
+Option A is more consistent with your chosen architecture.</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Option A — keep the port. I want the domain to stay pure.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Level 3: Interactions ━━━
+
+<span style="color:var(--text)">Save Link flow:</span>
+  Controller → SaveLinkUseCase.execute()
+    (1) URL(raw_url) → validate and normalize
+    (2) link_repo.find_by_url(normalized_url)
+    (3) if found → return Result.failure("duplicate", existing_id)
+    (4) metadata = fetcher.fetch(normalized_url)
+    (5) Link.create(url, metadata.title, metadata.description)
+    (6) link_repo.save(link)
+    (7) return Result.success(link)
+
+<span style="color:var(--text)">List Links flow:</span>
+  Controller → ListLinksUseCase.execute(page, per_page, filters)
+    (1) link_repo.list_paginated(page, per_page, filters)
+    (2) return Result.success(paginated_result)
+
+<span style="color:var(--text)">Delete Link flow:</span>
+  Controller → DeleteLinkUseCase.execute(link_id)
+    (1) link_repo.find_by_id(link_id)
+    (2) if not found → return Result.failure("not_found")
+    (3) link.soft_delete()
+    (4) link_repo.save(link)
+    (5) return Result.success()
+
+Dependency direction check:
+  adapters/inbound → ports/inbound → domain
+  adapters/outbound → ports/outbound → domain
+  ✓ All dependencies point inward per hexagonal rules.
+
+Approve interactions?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Looks good.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Level 4: Contracts ━━━
+
+<span style="color:var(--text)">URL (value object):</span>
+  __init__(raw: str) — validates, normalizes
+  normalized: str (property)
+  __eq__() — compares normalized values
+  __str__() — returns normalized form
+
+<span style="color:var(--text)">Link (entity):</span>
+  id: LinkId (UUID)
+  url: URL
+  title: str
+  description: str
+  created_at: datetime
+  updated_at: datetime
+  deleted_at: datetime | None
+  soft_delete() → None
+  update(title?, description?, url?) → None
+
+<span style="color:var(--text)">SaveLinkUseCase:</span>
+  execute(raw_url: str, title: str | None, description: str | None)
+    → Result[Link]
+
+<span style="color:var(--text)">LinkRepository (outbound port):</span>
+  save(link: Link) → Link
+  find_by_id(id: LinkId) → Link | None
+  find_by_url(url: URL) → Link | None
+  list_paginated(page: int, per_page: int, filters: LinkFilters)
+    → PaginatedResult[Link]
+  soft_delete(id: LinkId) → None
+
+<span style="color:var(--text)">MetadataFetcher (outbound port):</span>
+  fetch(url: URL) → Result[PageMetadata]
+
+<span style="color:var(--text)">PageMetadata:</span>
+  title: str
+  description: str
+
+<span style="color:var(--text)">LinksController (FastAPI):</span>
+  POST   /api/links          → 201 Created | 409 Conflict
+  GET    /api/links          → 200 OK (paginated)
+  GET    /api/links/{id}     → 200 OK | 404 Not Found
+  PATCH  /api/links/{id}     → 200 OK | 404 Not Found
+  DELETE /api/links/{id}     → 204 No Content | 404 Not Found
+
+Secure-coding check at trust boundaries:
+  • URL validation before any processing ✓
+  • Input sanitization on title/description ✓
+  • No raw URL passed to database without normalization ✓
+
+Approve contracts?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Approved.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Blueprint finalized → .lattice/context/link-management.md
+
+<span style="color:var(--green)">Status: READY FOR IMPLEMENTATION</span>
+Components: 12 (3 domain, 7 ports, 4 adapters)
+Architecture: Hexagonal (ports &amp; adapters)
+
+Next: /code-forge</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">design-blueprint composed <b>design-first</b> (drove the 5 levels), <b>context-anchoring</b> (created living document), <b>architecture</b> (validated hexagonal dependency rules), <b>domain-driven-design</b> (classified URL as value object, Link as aggregate root), and <b>collaborative-judgment</b> (surfaced the MetadataFetcher port decision and caught the inferred C10 restore capability that wasn't in the requirements). The architecture atom used the custom hexagonal document (not embedded clean-architecture defaults) because architecture_mode is set to "custom" in config.yaml.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- STAGE 3: CODE FORGE (GREENFIELD SCAFFOLDING) -->
+<!-- ═══════════════════════════════════════ -->
+<div class="stage" id="stage-3">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number code">3</div>
+    <div class="stage-title">code-forge</div>
+    <div class="stage-subtitle">Scaffold project + inside-out implementation</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/code-forge</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Loading blueprint from .lattice/context/link-management.md
+Loading learnings from .lattice/learnings/review-insights.md ...
+  (no learnings yet — first feature cycle)
+
+<span style="color:var(--yellow)">⚠ No existing project structure detected. This is a greenfield build.</span>
+I'll scaffold the project before implementing components.
+
+Proposed scaffold:
+  linkstash/
+  ├── pyproject.toml
+  ├── src/
+  │   └── linkstash/
+  │       ├── domain/
+  │       │   ├── __init__.py
+  │       │   ├── entities/
+  │       │   └── value_objects/
+  │       ├── ports/
+  │       │   ├── inbound/
+  │       │   └── outbound/
+  │       ├── adapters/
+  │       │   ├── inbound/
+  │       │   └── outbound/
+  │       └── config/
+  └── tests/
+      ├── unit/
+      │   ├── domain/
+      │   └── ports/
+      └── integration/
+          └── adapters/
+
+Implementation plan (inside-out):
+
+<span style="color:var(--green)">Layer 1 — Domain:</span>
+  1.1 URL value object
+  1.2 LinkId value object
+  1.3 Link entity
+
+<span style="color:var(--accent)">Layer 2 — Ports:</span>
+  2.1 LinkRepository interface (outbound)
+  2.2 MetadataFetcher interface (outbound)
+  2.3 SaveLinkUseCase (inbound)
+  2.4 ListLinksUseCase, GetLinkUseCase, UpdateLinkUseCase, DeleteLinkUseCase
+
+<span style="color:var(--yellow)">Layer 3 — Adapters (outbound first):</span>
+  3.1 SqlAlchemyLinkRepository
+  3.2 HttpMetadataFetcher
+
+<span style="color:var(--purple)">Layer 4 — Adapters (inbound):</span>
+  4.1 LinksController (FastAPI router)
+  4.2 Main app wiring (config/)
+
+Review mode?
+<span style="color:var(--accent)">1. Layer-by-layer (recommended)
+2. Full autonomy
+3. Component-by-component</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Layer-by-layer</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Scaffolding project ...
+
+  ✓ Created pyproject.toml (FastAPI, SQLAlchemy, httpx, pytest)
+  ✓ Created src/linkstash/ with hexagonal folder structure
+  ✓ Created tests/ with unit/ and integration/ subfolders
+  ✓ All __init__.py files in place
+
+━━━ Layer 1: Domain ━━━
+
+Generating domain components (pure Python, zero external deps)...
+
+Post-gen verification:
+  ✓ clean-code: All functions &lt;20 lines, SRP, clear naming
+  ✓ architecture: No external imports in domain (not even FastAPI)
+  ✓ DDD: URL is immutable value object, equality by normalized value
+  ✓ DDD: Link is aggregate root, owns its lifecycle
+  ✓ language-idioms: Result type for expected failures, snake_case naming
+
+Files:
+  src/linkstash/domain/value_objects/url.py
+  src/linkstash/domain/value_objects/link_id.py
+  src/linkstash/domain/entities/link.py
+  src/linkstash/domain/entities/__init__.py
+  src/linkstash/domain/value_objects/__init__.py
+  tests/unit/domain/test_url.py
+  tests/unit/domain/test_link.py
+
+Tests: <span style="color:var(--green)">9 passing</span>
+  - URL validates, normalizes, compares correctly
+  - Link creates, updates, soft-deletes correctly
+  - Edge cases: trailing slashes, case-insensitive hosts
+
+<span style="color:var(--accent)">[Approve layer] [Request changes]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Approve layer</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Layer 2: Ports ━━━
+
+Generating port interfaces + use cases...
+
+Post-gen verification:
+  ✓ clean-code: SRP, each use case does one thing
+  ✓ architecture: Ports depend only on domain — no adapter imports
+
+DDD check (conditional — domain touch):
+  ✓ Use cases operate on domain entities, not raw data
+
+Files:
+  src/linkstash/ports/outbound/link_repository.py
+  src/linkstash/ports/outbound/metadata_fetcher.py
+  src/linkstash/ports/inbound/save_link.py
+  src/linkstash/ports/inbound/list_links.py
+  src/linkstash/ports/inbound/get_link.py
+  src/linkstash/ports/inbound/update_link.py
+  src/linkstash/ports/inbound/delete_link.py
+  tests/unit/ports/test_save_link.py
+  tests/unit/ports/test_list_links.py
+
+Tests: <span style="color:var(--green)">8 passing</span>
+  - SaveLink detects duplicates, handles fetch failures
+  - ListLinks paginates, filters by date
+
+<span style="color:var(--accent)">[Approve layer] [Request changes]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Approve layer</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Layer 3: Outbound Adapters ━━━
+
+Generating adapter implementations...
+
+Post-gen verification:
+  ✓ clean-code: SRP, naming clear
+  ✓ architecture: Adapters depend on ports — not on domain entities directly
+  ✓ architecture: adapters/ never imports from other adapters/
+
+Secure-coding scan (trust boundary — DB):
+  ✓ SQLAlchemy parameterized queries (no injection risk)
+  ✓ URL normalized before storage (consistent comparison)
+
+Secure-coding scan (trust boundary — HTTP):
+  ✓ Outbound HTTP timeout configured (10s)
+  ✓ Response size limited on metadata fetch
+  <span style="color:var(--yellow)">⚠ Judgment call: Metadata fetch failure handling</span>
+
+  The use case already handles Result.failure for fetch errors.
+  The adapter can either:
+    A. Return Result.failure on timeout/error (use case handles gracefully)
+    B. Raise an exception (use case doesn't catch — becomes 500)
+
+  Given the domain rule "save link even if metadata fetch fails,"
+  Option A is already implemented. Just flagging for visibility.</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Option A is correct. The link should save regardless.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Noted. Proceeding.
+
+Files:
+  src/linkstash/adapters/outbound/sqlalchemy_link_repo.py
+  src/linkstash/adapters/outbound/http_metadata_fetcher.py
+  src/linkstash/adapters/outbound/models.py (SQLAlchemy ORM models)
+  tests/integration/adapters/test_sqlalchemy_repo.py
+  tests/integration/adapters/test_http_fetcher.py
+
+Tests: <span style="color:var(--green)">6 passing</span> (4 integration with test DB)
+
+<span style="color:var(--accent)">[Approve layer] [Request changes]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Approve layer</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Layer 4: Inbound Adapters + Wiring ━━━
+
+Generating FastAPI controller and app wiring...
+
+Post-gen verification:
+  ✓ clean-code: SRP, thin controller (delegates to use case)
+  ✓ architecture: Controller depends on port/inbound — not on domain or adapters
+  ✓ secure-coding: Input validation via Pydantic schemas at HTTP boundary
+
+Files:
+  src/linkstash/adapters/inbound/links_controller.py
+  src/linkstash/adapters/inbound/schemas.py (Pydantic request/response)
+  src/linkstash/config/app.py (FastAPI app factory, DI wiring)
+  src/linkstash/config/database.py (SQLAlchemy session setup)
+  tests/integration/adapters/test_links_controller.py
+
+Tests: <span style="color:var(--green)">5 passing</span> (full HTTP integration tests)
+
+Cross-component verification:
+  ✓ All interaction flows match blueprint L3 design
+  ✓ Dependency direction: inbound → ports → domain ← outbound → ports
+  ✓ Zero unplanned components
+  ✓ Security: URL validated at boundary, normalized before storage
+  ✓ No past learnings to check (first cycle)
+
+<span style="color:var(--green)">Total: 21 files created</span>
+<span style="color:var(--green)">Tests: 28 passing (9 unit + 10 integration + 9 port)</span>
+
+Context document enriched with implementation decisions.
+Recommend running <span style="color:var(--accent)">/review</span> before considering this feature done.</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">code-forge noticed the empty directory and added a scaffolding step before the inside-out build. It created the full project structure (pyproject.toml, src/, tests/) matching the hexagonal layout defined by the architecture-refiner. <b>clean-code</b> and <b>architecture</b> ran on every component. <b>DDD</b> ran on Layer 1 (domain) and Layer 2 (ports, since they touch domain types). <b>secure-coding</b> ran at trust boundaries (DB adapter, HTTP adapter, FastAPI controller). <b>language-idioms</b> adapted the atom defaults — Result types for error handling, snake_case naming, FastAPI Depends() for DI. The test-quality atom verified AAA structure and isolation across all test files.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- STAGE 4: REVIEW -->
+<!-- ═══════════════════════════════════════ -->
+<div class="stage" id="stage-4">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number rev">4</div>
+    <div class="stage-title">review</div>
+    <div class="stage-subtitle">Delta-scoped audit — everything is the delta on a greenfield</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/review</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Identifying delta... 21 files (all new — greenfield build)
+
+Classifying:
+  • Domain (5 files) → loading DDD
+  • Ports (9 files) → loading DDD (touch domain types)
+  • Adapters outbound (4 files) → loading secure-coding (DB + HTTP)
+  • Adapters inbound (3 files) → loading secure-coding (HTTP boundary)
+  • Tests (8 files) → loading test-quality
+
+Atoms: clean-code, architecture, DDD, secure-coding, test-quality
+
+Running validation...
+
+━━━ REVIEW REPORT ━━━
+
+<span style="color:var(--red)">CRITICAL (0)</span>
+
+<span style="color:var(--yellow)">WARNINGS (2)</span>
+
+<span style="color:var(--yellow)">W1.</span> [links_controller.py:34] Missing pagination bounds
+  The list endpoint accepts page and per_page from the user but
+  doesn't cap per_page. A request with per_page=1000000 would load
+  the entire table into memory.
+  <span style="color:var(--text)">Fix: Enforce max per_page (e.g. 100) in the Pydantic schema or use case.</span>
+
+<span style="color:var(--yellow)">W2.</span> [http_metadata_fetcher.py:28] SSRF risk on metadata fetch
+  The fetcher makes an HTTP request to the user-supplied URL without
+  blocking internal network addresses. An attacker could submit
+  http://localhost:5432 or http://169.254.169.254 (AWS metadata).
+  <span style="color:var(--text)">Fix: Validate that the resolved host is not a private/internal IP
+  before making the request. Add a blocklist for common internal ranges.</span>
+
+<span style="color:var(--accent)">SUGGESTIONS (2)</span>
+
+<span style="color:var(--accent)">S1.</span> [link.py:22] Consider extracting URL normalization into a dedicated method
+  URL.__init__() does validation and normalization in one step.
+  A separate normalize() classmethod would make it testable in
+  isolation and clearer in intent.
+
+<span style="color:var(--accent)">S2.</span> [test_save_link.py] Add test for concurrent duplicate saves
+  Two requests with the same URL arriving simultaneously could
+  both pass the duplicate check and create two links. A unique
+  database constraint would prevent this.
+
+<span style="color:var(--green)">WHAT'S DONE WELL</span>
+  • Pure domain layer — zero external imports, fully testable in isolation
+  • Clean hexagonal dependency direction throughout
+  • Result type pattern used consistently (no exceptions for expected failures)
+  • Good test separation: unit tests need no I/O, integration tests use test DB
+  • URL normalization prevents subtle duplicate bugs
+
+Writing insights to .lattice/learnings/review-insights.md ...
+Logging to .lattice/reviews/review-log.md ...</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Fix W1 and W2. S2 is a good idea too — add the constraint.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div><span style="color:var(--green)">W1 fixed:</span> Added max_value=100 to per_page in the Pydantic schema.
+  Default remains 25, max is 100.
+
+<span style="color:var(--green)">W2 fixed:</span> Added _is_private_host() check in http_metadata_fetcher.
+  Blocks RFC 1918 ranges, loopback, link-local, and cloud metadata IPs.
+  Returns Result.failure for blocked hosts — link still saves, metadata skipped.
+
+<span style="color:var(--green)">S2 fixed:</span> Added unique constraint on normalized_url in the SQLAlchemy model.
+  Added a database-level migration note to context document.
+  Updated integration test to verify the constraint fires.
+
+Re-running atom checks... ✓ all pass.
+Updated 4 files.</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">On a greenfield build, the "delta" is everything — all 21 files. review still classifies them by layer and concern so it loads only the atoms that apply to each file. It caught a real security vulnerability (SSRF via the metadata fetcher) and a performance risk (unbounded pagination). These are exactly the kind of issues that are easy to miss when building from scratch — the code looks clean, the architecture is correct, but the boundary conditions are wrong. The insights are persisted for future cycles.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- STAGE 5: RESULT -->
+<!-- ═══════════════════════════════════════ -->
+<div class="stage" id="stage-5">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number result">&#10022;</div>
+    <div class="stage-title">What's in .lattice/</div>
+    <div class="stage-subtitle">Accumulated context after one greenfield cycle</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-ai" style="margin-right:0"><div class="msg-label">Folder structure</div><div class="folder-tree">.lattice/
+├── config.yaml
+├── standards/
+│   ├── <span class="created">knowledge-base.md</span>
+│   ├── <span class="created">architecture.md</span> <span class="note">← hexagonal, override mode</span>
+│   └── <span class="created">language-idioms.md</span> <span class="note">← Python-specific patterns</span>
+├── requirements/
+│   ├── <span class="created">index.md</span> <span class="note">← 5 epics, only Epic 1 spec'd</span>
+│   └── features/
+│       ├── <span class="created">save-link.md</span>
+│       ├── <span class="created">list-links.md</span>
+│       ├── <span class="created">get-link.md</span>
+│       ├── <span class="created">update-link.md</span>
+│       └── <span class="created">delete-link.md</span>
+├── context/
+│   └── <span class="created">link-management.md</span> <span class="note">← enriched across 3 stages</span>
+├── learnings/
+│   └── <span class="created">review-insights.md</span>
+│       <span class="note">  "cap pagination limits at API boundaries"</span>
+│       <span class="note">  "block private IPs on outbound HTTP fetches"</span>
+│       <span class="note">  "add unique DB constraints for deduplication"</span>
+└── reviews/
+    └── <span class="created">review-log.md</span></div></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-ai" style="margin-right:0"><div class="msg-label">Project structure</div><div class="folder-tree">linkstash/
+├── pyproject.toml
+├── src/
+│   └── linkstash/
+│       ├── <span class="newdir">domain/</span>
+│       │   ├── entities/
+│       │   │   └── link.py
+│       │   └── value_objects/
+│       │       ├── url.py
+│       │       └── link_id.py
+│       ├── <span class="newdir">ports/</span>
+│       │   ├── inbound/
+│       │   │   ├── save_link.py
+│       │   │   ├── list_links.py
+│       │   │   ├── get_link.py
+│       │   │   ├── update_link.py
+│       │   │   └── delete_link.py
+│       │   └── outbound/
+│       │       ├── link_repository.py
+│       │       └── metadata_fetcher.py
+│       ├── <span class="newdir">adapters/</span>
+│       │   ├── inbound/
+│       │   │   ├── links_controller.py
+│       │   │   └── schemas.py
+│       │   └── outbound/
+│       │       ├── sqlalchemy_link_repo.py
+│       │       ├── http_metadata_fetcher.py
+│       │       └── models.py
+│       └── <span class="newdir">config/</span>
+│           ├── app.py
+│           └── database.py
+└── tests/
+    ├── unit/
+    │   ├── domain/
+    │   └── ports/
+    └── integration/
+        └── adapters/</div></div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> What happens next</div>
+      <div class="hoodie-body">Next session: run <b>/requirement-forge</b> again. It detects the existing specs, sees Epic 1 is done, and offers to spec Epic 2 (Organization — tags and collections). The design-blueprint for tags will load the existing link-management context so it knows how links work. code-forge will load the three review insights and proactively cap pagination, block private IPs on any new outbound fetches, and add unique constraints. The architecture document means the new code follows the same hexagonal rules automatically. The living context layer compounds — each cycle makes the next one smarter.</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> How this differs from the .NET walkthrough</div>
+      <div class="hoodie-body"><b>Init:</b> No code to scan — refiners asked everything from scratch. Four refiners instead of three (added language-idioms for Python patterns).<br><br><b>Architecture:</b> Used the generic flow (hexagonal) instead of the clean-architecture flow. Output in override mode (no embedded defaults to overlay). Config sets architecture_mode: custom.<br><br><b>Requirements:</b> Multi-epic product triggered session focus — only Epic 1 was spec'd. The index tracks which epics are done for future sessions.<br><br><b>Code-forge:</b> Added a scaffolding step (project structure, pyproject.toml) before the inside-out build. Language-idioms atom adapted patterns to Python (Result types, snake_case, FastAPI Depends).<br><br><b>Review:</b> Caught Python-specific security issues (SSRF via outbound HTTP) and FastAPI-specific concerns (unbounded Pydantic pagination). Insights are language-aware for future cycles.</div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<script>
+function toggle(header) {
+  const stage = header.parentElement;
+  stage.classList.toggle('open');
+  updateNav();
+}
+
+function toggleHoodie(el) {
+  el.classList.toggle('open');
+}
+
+function goStage(n) {
+  const stages = document.querySelectorAll('.stage');
+  stages[n].classList.toggle('open');
+  stages[n].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  updateNav();
+}
+
+function toggleAll(open) {
+  document.querySelectorAll('.stage').forEach(s => {
+    if (open) s.classList.add('open');
+    else s.classList.remove('open');
+  });
+  document.querySelectorAll('.hoodie').forEach(h => {
+    if (open) h.classList.add('open');
+    else h.classList.remove('open');
+  });
+  updateNav();
+}
+
+function updateNav() {
+  const stages = document.querySelectorAll('.stage');
+  const steps = document.querySelectorAll('.pipeline-step');
+  steps.forEach((step, i) => {
+    if (stages[i] && stages[i].classList.contains('open')) {
+      step.classList.add('active');
+    } else {
+      step.classList.remove('active');
+    }
+  });
+}
+</script>
+
+</body>
+</html>

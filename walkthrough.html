@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lattice — Simulated Interaction Walkthrough</title>
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b22;
+    --surface2: #1c2129;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-dim: #1f3a5f;
+    --green: #3fb950;
+    --green-dim: #1a3a2a;
+    --yellow: #d29922;
+    --yellow-dim: #3a2f1a;
+    --purple: #bc8cff;
+    --purple-dim: #2d1f4e;
+    --red: #f85149;
+    --user-bg: #172a3a;
+    --ai-bg: #1c2129;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    padding: 2rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header h1 { font-size: 1.5rem; font-weight: 600; }
+  .header p { color: var(--text-dim); margin-top: 0.25rem; font-size: 0.9rem; }
+
+  /* Pipeline nav */
+  .pipeline-nav {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    position: sticky;
+    top: 64px;
+    z-index: 99;
+  }
+  .pipeline-step {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pipeline-step:hover { color: var(--text); background: var(--surface2); }
+  .pipeline-step.active { color: var(--accent); background: var(--accent-dim); }
+  .pipeline-arrow { color: var(--border); display: flex; align-items: center; font-size: 0.7rem; }
+
+  /* Expand/collapse all */
+  .controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    max-width: 800px;
+    margin: 1rem auto 0;
+    padding: 0 1rem;
+  }
+  .controls button {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .controls button:hover { color: var(--text); border-color: var(--accent); }
+
+  /* Main content */
+  .content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  /* Stage sections */
+  .stage {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .stage-header:hover { background: var(--surface2); }
+
+  .stage-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .stage-number.init { background: var(--yellow-dim); color: var(--yellow); }
+  .stage-number.req { background: var(--accent-dim); color: var(--accent); }
+  .stage-number.des { background: var(--green-dim); color: var(--green); }
+  .stage-number.code { background: var(--purple-dim); color: var(--purple); }
+  .stage-number.rev { background: #3a1a1a; color: var(--red); }
+
+  .stage-title { font-weight: 600; font-size: 0.95rem; }
+  .stage-subtitle { color: var(--text-dim); font-size: 0.8rem; margin-left: auto; }
+
+  .stage-chevron {
+    color: var(--text-dim);
+    transition: transform 0.2s;
+    font-size: 0.8rem;
+  }
+  .stage.open .stage-chevron { transform: rotate(90deg); }
+
+  .stage-body {
+    display: none;
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+  .stage.open .stage-body { display: block; }
+
+  /* Exchanges */
+  .exchange {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .exchange:last-child { border-bottom: none; }
+
+  .msg {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .msg:last-child { margin-bottom: 0; }
+
+  .msg-user {
+    background: var(--user-bg);
+    border: 1px solid #1f3a5f;
+    margin-left: 2rem;
+  }
+  .msg-ai {
+    background: var(--ai-bg);
+    border: 1px solid var(--border);
+    margin-right: 2rem;
+  }
+
+  .msg-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.35rem;
+  }
+  .msg-user .msg-label { color: var(--accent); }
+  .msg-ai .msg-label { color: var(--green); }
+
+  /* Under the hood callout */
+  .hoodie {
+    margin: 0.75rem 0 0.25rem 0;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .hoodie-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+  .hoodie-header:hover { color: var(--text); }
+  .hoodie-chevron {
+    font-size: 0.65rem;
+    transition: transform 0.2s;
+  }
+  .hoodie.open .hoodie-chevron { transform: rotate(90deg); }
+  .hoodie-body {
+    display: none;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    background: rgba(139,148,158,0.05);
+  }
+  .hoodie.open .hoodie-body { display: block; }
+
+  /* Folder tree */
+  .folder-tree {
+    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: 6px;
+    margin: 0.5rem 0;
+    color: var(--text-dim);
+  }
+  .folder-tree .created { color: var(--green); }
+  .folder-tree .note { color: var(--yellow); font-family: inherit; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .msg-user { margin-left: 0; }
+    .msg-ai { margin-right: 0; }
+    .stage-subtitle { display: none; }
+    .pipeline-nav { gap: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Lattice Walkthrough</h1>
+  <p>Adding "Password Reset" to an existing .NET 8 User Service — a full pipeline session</p>
+</div>
+
+<div class="pipeline-nav" id="pipelineNav">
+  <div class="pipeline-step" onclick="goStage(0)">0 · Init</div>
+  <div class="pipeline-arrow">▸</div>
+  <div class="pipeline-step" onclick="goStage(1)">1 · Requirements</div>
+  <div class="pipeline-arrow">▸</div>
+  <div class="pipeline-step" onclick="goStage(2)">2 · Design</div>
+  <div class="pipeline-arrow">▸</div>
+  <div class="pipeline-step" onclick="goStage(3)">3 · Implement</div>
+  <div class="pipeline-arrow">▸</div>
+  <div class="pipeline-step" onclick="goStage(4)">4 · Review</div>
+  <div class="pipeline-arrow">▸</div>
+  <div class="pipeline-step" onclick="goStage(5)">5 · Result</div>
+</div>
+
+<div class="controls">
+  <button onclick="toggleAll(true)">Expand all</button>
+  <button onclick="toggleAll(false)">Collapse all</button>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STAGE 0: INIT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="stage" id="stage-0">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number init">0</div>
+    <div class="stage-title">lattice-init</div>
+    <div class="stage-subtitle">Scan project, run refiners, configure defaults</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/lattice-init</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>I scanned your project. Here's what I found:
+
+<span style="color:var(--text)">Detected:</span> .NET 8, C#, xUnit, Entity Framework Core
+<span style="color:var(--text)">Structure:</span> src/Domain, src/Application, src/Infrastructure, src/WebApi
+
+<span style="color:var(--text)">Lattice status:</span>
+<span style="color:var(--red)">✗</span> No .lattice/ folder found — fresh setup
+
+I recommend running these refiners in order:
+
+  1. /knowledge-priming-refiner  (project identity)
+  2. /architecture-refiner       (layer rules for your structure)
+  3. /clean-code-refiner         (team coding standards)
+
+Run all three, or skip to start using the pipeline with defaults?
+<span style="color:var(--accent)">[Run #1] [Run all] [Skip — use defaults]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Run all</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Starting with knowledge-priming-refiner.
+
+What database are you using?
+<span style="color:var(--accent)">[PostgreSQL] [SQL Server] [SQLite] [Other]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>PostgreSQL</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>ORM?
+<span style="color:var(--accent)">[Entity Framework Core] [Dapper] [Raw ADO.NET] [Other]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>EF Core</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Any DI framework besides the built-in Microsoft.Extensions.DependencyInjection?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>No, built-in is fine.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Your project identity:
+
+  Language:  C# 12 / .NET 8
+  DB:        PostgreSQL via EF Core
+  DI:        Microsoft.Extensions.DependencyInjection
+  Test:      xUnit + FluentAssertions
+  Structure: Clean Architecture (4 layers)
+
+Writing .lattice/standards/knowledge-base.md ... done.
+
+Now running architecture-refiner...
+
+I detected 4 layers in your src/ folder:
+
+  Domain → Application → Infrastructure → WebApi
+
+This looks like clean architecture. Does this match?
+<span style="color:var(--accent)">[Clean Architecture — looks right] [Hexagonal] [Custom]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Clean Architecture — looks right</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>I'll walk through each section. Tell me if anything should differ.
+
+§1 Layers — four layers, dependencies point inward only.
+Match? <span style="color:var(--accent)">[Yes] [Change]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Yes</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>§2 Service pattern — unified services (single class per use case).
+<span style="color:var(--accent)">[Yes] [I use CQRS — separate command/query handlers]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>I use CQRS — separate command/query handlers</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Noted — CQRS with separate handlers. This affects §3 and §4. I'll flag those.
+
+§3 Domain layer rules — defaults: no infrastructure concerns in domain, no static methods, all domain logic in entities/aggregates.
+Match? <span style="color:var(--accent)">[Yes] [Change]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Yes</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Remaining sections match. Writing .lattice/standards/architecture.md (overlay mode) ... done.
+
+Now running clean-code-refiner...
+
+Defaults: SRP, &lt;20 line functions, cyclomatic &lt;10, no magic numbers, meaningful naming.
+<span style="color:var(--accent)">[Defaults are fine] [I have specific rules]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Defaults are fine</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>No custom clean-code document needed — embedded defaults are active.
+
+<span style="color:var(--green)">Setup complete.</span> Your pipeline:
+
+  /requirement-forge → /design-blueprint → /code-forge → /review
+
+Ready when you are.</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">lattice-init composed the <b>knowledge-priming</b> atom — it scanned the directory, detected languages/frameworks, and checked for .lattice/. Each refiner ran a guided interview. The architecture-refiner noticed the CQRS deviation and flagged downstream sections. It wrote an overlay document (only changed sections). All atoms will now resolve their rules via .lattice/config.yaml → project-specific standards → embedded defaults.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STAGE 1: REQUIREMENT FORGE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="stage" id="stage-1">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number req">1</div>
+    <div class="stage-title">requirement-forge</div>
+    <div class="stage-subtitle">Define epics, features, and acceptance scenarios</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/requirement-forge</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Do you have existing requirements — PRDs, feature lists, Jira tickets? Or start from scratch?
+<span style="color:var(--accent)">[I have existing material] [Start from scratch]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Start from scratch. We need password reset for the User Service.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Epic proposal:
+
+<span style="color:var(--text)">Account Recovery</span> — Self-service password reset for authenticated users.
+Excludes: Admin-forced resets, account lockout policy (separate epic).
+
+Scope feel right?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Looks right.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Feature breakdown:
+
+  1. Password Reset Request — submit email, receive reset token
+  2. Password Reset Confirmation — submit token + new password
+  3. Reset Token Expiry — tokens expire after 15 minutes
+
+Anything missing? Anything that's a technical task, not a feature?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>#3 is an implementation detail, not a feature. Fold it into #2.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Good catch. Revised:
+
+  1. Password Reset Request
+  2. Password Reset Confirmation (includes token expiry)
+
+Starting Feature 1.
+
+<span style="color:var(--text)">Frame:</span>
+  Problem:      Users forget passwords, no self-service recovery.
+  Dependencies: User entity exists, email service exists.
+  In scope:     Generate token, persist token, send email.
+  Out of scope: Token format, email template.
+  Boundary:     What if email doesn't match any account?
+
+<span style="color:var(--accent)">[Silent success — don't reveal account existence]
+[Return error — tell user account not found]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Silent success. Don't reveal whether the account exists.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Security constraint noted. Scenarios for Feature 1:
+
+<span style="color:var(--text)">Scenario 1: Valid email, account exists</span>
+  Given a registered user with email "alice@example.com"
+  When they request a password reset
+  Then a reset token is generated and stored
+  And a reset email is sent to "alice@example.com"
+
+<span style="color:var(--text)">Scenario 2: Email not associated with any account</span>
+  Given no user with email "nobody@example.com"
+  When they request a password reset
+  Then the response is identical to Scenario 1 (200 OK)
+  And no email is sent
+
+<span style="color:var(--text)">Scenario 3: Rate limiting</span>
+  Given a user requested reset 30 seconds ago
+  When they request again
+  Then accepted but no new token is generated
+
+Anything missing?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Looks good.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Implementation slices for Feature 1:
+
+  A. ResetToken value object (domain)
+  B. RequestPasswordReset command + handler (application)
+  C. IPasswordResetTokenRepository (domain contract)
+  D. Email notification service call (infrastructure)
+  E. API endpoint (interface)
+
+Requirement-quality checklist: ✓ all checks pass.
+Writing .lattice/requirements/features/password-reset-request.md ... done.
+
+Now speccing Feature 2: Password Reset Confirmation...</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>(Feature 2 follows same pattern — skip for brevity)</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Both features specced.
+Writing .lattice/requirements/index.md ... done.
+
+<span style="color:var(--green)">Requirements ready.</span> Next step: /design-blueprint</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">requirement-forge composed <b>requirement-quality</b> (validated specs against checklists), <b>knowledge-priming</b> (knew this was .NET + clean architecture), and <b>collaborative-judgment</b> (surfaced the silent-success decision as a structured choice instead of silently assuming). Output written to .lattice/requirements/.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STAGE 2: DESIGN BLUEPRINT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="stage" id="stage-2">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number des">2</div>
+    <div class="stage-title">design-blueprint</div>
+    <div class="stage-subtitle">5-level structured design before any code</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/design-blueprint</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Loading requirements from .lattice/requirements/ ...
+
+Which feature to design?
+<span style="color:var(--accent)">[Both — design together] [One at a time]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Both — design together</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Creating .lattice/context/password-reset.md
+
+━━━ Level 1: Capabilities ━━━
+
+  C1. Accept a password reset request for an email
+  C2. Generate and persist a time-limited reset token
+  C3. Send a reset email containing the token
+  C4. Accept a token + new password
+  C5. Validate the token (exists, not expired, not used)
+  C6. Update the user's password
+  C7. Invalidate the used token
+
+Approve capabilities?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Go ahead.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Level 2: Components ━━━
+
+Applying architecture rules (CQRS pattern):
+
+<span style="color:var(--green)">Domain:</span>
+  • ResetToken (value object) — token value, expiry, used flag
+  • User (existing entity) — adds ResetPassword() method
+  • IPasswordResetTokenRepository (interface)
+  • IIdentityEmailService (interface)
+
+<span style="color:var(--accent)">Application:</span>
+  • RequestPasswordResetCommand + Handler
+  • ResetPasswordCommand + Handler
+  • TokenGenerationService (domain service)
+
+<span style="color:var(--yellow)">Infrastructure:</span>
+  • PasswordResetTokenRepository (EF Core)
+  • SmtpEmailService
+
+<span style="color:var(--purple)">Interface:</span>
+  • PasswordResetController
+    - POST /api/password-reset/request
+    - POST /api/password-reset/confirm
+
+DDD checks:
+  • ResetToken is value object (immutable, equality by value) ✓
+  • Password reset is domain concern ✓
+
+Approve components?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>TokenGenerationService — Domain or Application?</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Judgment call — two valid options:
+
+<span style="color:var(--text)">Option A: Domain</span> (recommended)
+  Token generation is a business rule (format, expiry, uniqueness).
+  Tradeoff: Domain layer gets slightly more code.
+
+<span style="color:var(--text)">Option B: Application</span>
+  Handler generates the token inline.
+  Tradeoff: Business rule leaks to application layer.
+
+Given the 15-minute expiry constraint belongs in the domain, Option A keeps the rule where it belongs.</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Option A — Domain it is.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Level 3: Interactions ━━━
+
+<span style="color:var(--text)">Request flow:</span>
+  Controller → CommandHandler →
+    (1) load user by email
+    (2) if no user → return success (silent)
+    (3) TokenGenerationService.Generate()
+    (4) repository.Store(user.Id, token)
+    (5) emailService.SendResetLink(user.Email, token)
+
+<span style="color:var(--text)">Confirm flow:</span>
+  Controller → CommandHandler →
+    (1) load token from repository
+    (2) validate: exists, not expired, not used
+    (3) load user
+    (4) user.ResetPassword(newPassword)
+    (5) token.MarkUsed()
+    (6) repository.Save(token)
+    (7) unit of work commits
+
+Dependency direction:
+  Interface → Application → Domain ← Infrastructure
+  ✓ All inward per your architecture rules.
+
+Approve interactions?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Looks good.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Level 4: Contracts ━━━
+
+<span style="color:var(--text)">RequestPasswordResetCommand:</span>
+  Email: string (required, email format)
+  → void (always 200 OK)
+
+<span style="color:var(--text)">ResetPasswordCommand:</span>
+  Token: string (required, 64 chars, hex)
+  NewPassword: string (required, min 8 chars)
+  → void (200) or InvalidTokenError (400)
+
+<span style="color:var(--text)">IPasswordResetTokenRepository:</span>
+  StoreAsync(userId, token) → void
+  FindByValueAsync(tokenValue) → ResetTokenRecord?
+
+<span style="color:var(--text)">IIdentityEmailService:</span>
+  SendPasswordResetEmailAsync(email, resetToken) → void
+
+<span style="color:var(--text)">ResetToken (value object):</span>
+  Value: string (64-char hex)
+  ExpiresAt: DateTime
+  IsUsed: bool
+  IsValid(): bool
+  MarkUsed(): void
+
+<span style="color:var(--text)">User.ResetPassword(newPassword):</span> void
+  — hashes and updates password
+
+Secure-coding check at trust boundaries:
+  • Token is cryptographic random ✓
+  • Password hashed before storage ✓
+  • Email not leaked in error responses ✓
+
+Approve contracts?</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Approved.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Blueprint finalized → .lattice/context/password-reset.md
+
+<span style="color:var(--green)">Status: READY FOR IMPLEMENTATION</span>
+Components: 8 | Layers: 4 (Domain → Infrastructure → Application → Interface)
+
+Next: /code-forge</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">design-blueprint composed <b>design-first</b> (drove the 5 levels), <b>context-anchoring</b> (created the living document), <b>architecture</b> (validated layers and dependency direction), <b>domain-driven-design</b> (classified entities vs value objects), <b>knowledge-priming</b> (knew CQRS pattern), and <b>collaborative-judgment</b> (surfaced the TokenGenerationService placement). It stopped at Level 4 — Level 5 (implementation) is code-forge's job.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STAGE 3: CODE FORGE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="stage" id="stage-3">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number code">3</div>
+    <div class="stage-title">code-forge</div>
+    <div class="stage-subtitle">Inside-out implementation with post-gen verification</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/code-forge</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Loading blueprint from .lattice/context/password-reset.md
+Loading learnings from .lattice/learnings/review-insights.md ...
+  (no learnings yet — first feature cycle)
+
+Implementation plan (inside-out):
+
+<span style="color:var(--green)">Layer 1 — Domain:</span>
+  1.1 ResetToken value object
+  1.2 User.ResetPassword() method
+  1.3 TokenGenerationService
+  1.4 IPasswordResetTokenRepository interface
+  1.5 IIdentityEmailService interface
+
+<span style="color:var(--yellow)">Layer 2 — Infrastructure:</span>
+  2.1 PasswordResetTokenRepository (EF Core)
+  2.2 SmtpEmailService
+
+<span style="color:var(--accent)">Layer 3 — Application:</span>
+  3.1 RequestPasswordResetCommand + Handler
+  3.2 ResetPasswordCommand + Handler
+
+<span style="color:var(--purple)">Layer 4 — Interface:</span>
+  4.1 PasswordResetController
+
+Review mode?
+<span style="color:var(--accent)">1. Layer-by-layer (recommended)
+2. Full autonomy
+3. Component-by-component</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Layer-by-layer</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Layer 1: Domain ━━━
+
+Generating domain components...
+
+Post-gen verification:
+  ✓ clean-code: All functions &lt;20 lines, SRP, clear naming
+  ✓ architecture: No infrastructure refs in domain layer
+  ✓ DDD: ResetToken is immutable value object, equality by value
+  ✓ DDD: User.ResetPassword() keeps behavior in entity (not anemic)
+
+Files:
+  src/Domain/ValueObjects/ResetToken.cs
+  src/Domain/Entities/User.cs (modified)
+  src/Domain/Services/TokenGenerationService.cs
+  src/Domain/Interfaces/IPasswordResetTokenRepository.cs
+  src/Domain/Interfaces/IIdentityEmailService.cs
+  tests/Domain.Tests/ResetTokenTests.cs
+  tests/Domain.Tests/TokenGenerationServiceTests.cs
+
+Tests: <span style="color:var(--green)">7 passing</span>
+
+<span style="color:var(--accent)">[Approve layer] [Request changes]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Approve layer</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Layer 2: Infrastructure ━━━
+
+Generating infrastructure components...
+
+Post-gen verification:
+  ✓ clean-code: SRP, naming clear
+  ✓ architecture: Depends on Domain only
+
+Secure-coding scan (trust boundary — DB access):
+  ✓ Parameterized queries via EF Core
+  <span style="color:var(--yellow)">⚠ Judgment call: Reset token storage</span>
+
+  A. Store plaintext (simpler — token is already random/unpredictable)
+  B. Hash before storage (defense-in-depth — but needs lookup strategy)</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Option A — plaintext is fine for single-use random tokens.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Noted. Proceeding with plaintext storage.
+
+Files:
+  src/Infrastructure/Repositories/PasswordResetTokenRepository.cs
+  src/Infrastructure/Email/SmtpEmailService.cs
+  tests/Infrastructure.Tests/PasswordResetTokenRepositoryTests.cs
+
+Tests: <span style="color:var(--green)">4 passing</span>
+
+<span style="color:var(--accent)">[Approve layer] [Request changes]</span></div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Approve layer</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>━━━ Layer 3: Application ━━━
+━━━ Layer 4: Interface ━━━
+
+Generating remaining layers...
+
+Cross-component verification:
+  ✓ Interaction flows match blueprint L3 design
+  ✓ All dependency directions inward
+  ✓ Zero unplanned components
+  ✓ Security: silent success on unknown email ✓
+
+<span style="color:var(--green)">Total: 12 files created, 2 modified</span>
+<span style="color:var(--green)">Tests: 19 passing across all layers</span>
+
+Context document enriched with implementation decisions.
+
+Recommend running <span style="color:var(--accent)">/review</span> before considering this feature done.</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">code-forge composed 8 atoms. <b>clean-code</b> and <b>architecture</b> ran on every component. <b>DDD</b> only ran on Layer 1 (domain). <b>secure-coding</b> only ran at trust boundaries (DB, email, HTTP). <b>test-quality</b> ran on test files. The two-pass model (generate → verify) means each component was checked against atom checklists before presentation. <b>context-anchoring</b> captured the plaintext-token decision in the living document for future sessions.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STAGE 4: REVIEW -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="stage" id="stage-4">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number rev">4</div>
+    <div class="stage-title">review</div>
+    <div class="stage-subtitle">Delta-scoped audit with insight capture</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>/review</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div>Identifying delta... 14 files changed (12 new, 2 modified)
+
+Classifying:
+  • Domain (5 files) → loading DDD
+  • Infrastructure (3 files) → loading secure-coding
+  • Application (2 files)
+  • Interface (1 file) → loading secure-coding
+  • Tests (6 files) → loading test-quality
+
+Atoms: clean-code, architecture, DDD, secure-coding, test-quality
+
+Running validation...
+
+━━━ REVIEW REPORT ━━━
+
+<span style="color:var(--red)">CRITICAL (0)</span>
+
+<span style="color:var(--yellow)">WARNINGS (1)</span>
+
+<span style="color:var(--yellow)">W1.</span> [PasswordResetController.cs:23] Missing rate limiting
+  The reset endpoint has no rate limiting. Requirement says "accepted
+  but no new token generated" for rapid re-requests, but the handler
+  always generates a new token.
+  <span style="color:var(--text)">Fix: Check for existing unexpired token before generating.</span>
+
+<span style="color:var(--accent)">SUGGESTIONS (2)</span>
+
+<span style="color:var(--accent)">S1.</span> [ResetPasswordHandler.cs:31] Wrap in transaction
+  Password update + token invalidation should be atomic. If one fails
+  after the other succeeds → inconsistent state.
+  <span style="color:var(--text)">Suggestion: Wrap in unit of work or explicit transaction.</span>
+
+<span style="color:var(--accent)">S2.</span> [ResetTokenTests.cs] Missing negative test for expired token
+  Tests cover valid and used tokens but not the expiry path.
+
+<span style="color:var(--green)">WHAT'S DONE WELL</span>
+  • Clean separation across all layers
+  • Silent success correctly implemented (no account enumeration)
+  • Value object design for ResetToken is clean and immutable
+  • Good test coverage on domain logic (7 tests for ResetToken alone)
+
+Writing insights to .lattice/learnings/review-insights.md ...
+Logging to .lattice/reviews/review-log.md ...</div>
+    </div>
+
+    <div class="exchange">
+      <div class="msg msg-user"><div class="msg-label">You</div>Fix W1 and S1.</div>
+      <div class="msg msg-ai"><div class="msg-label">AI</div><span style="color:var(--green)">W1 fixed:</span> Added existing-token check in RequestPasswordResetHandler. Now loads unexpired token first — if found, returns success without generating a new one.
+
+<span style="color:var(--green)">S1 fixed:</span> Wrapped confirm handler in IUnitOfWork.CommitAsync(). Password update and token invalidation are now atomic.
+
+Re-running atom checks... ✓ all pass.
+Updated 2 files.</div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> Under the hood</div>
+      <div class="hoodie-body">review classified the delta by layer/concern and loaded only relevant atoms. It caught a requirements gap (rate limiting), a consistency risk (transaction), and a test gap. Insights persisted to .lattice/learnings/ — next time code-forge runs, it loads these and proactively checks for rate limiting and transaction wrapping before generating code.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- STAGE 5: RESULT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="stage" id="stage-5">
+  <div class="stage-header" onclick="toggle(this)">
+    <div class="stage-number init">✦</div>
+    <div class="stage-title">What's in .lattice/</div>
+    <div class="stage-subtitle">The accumulated context after one full cycle</div>
+    <div class="stage-chevron">&#9654;</div>
+  </div>
+  <div class="stage-body">
+
+    <div class="exchange">
+      <div class="msg msg-ai" style="margin-right:0"><div class="msg-label">Folder structure</div><div class="folder-tree">.lattice/
+├── config.yaml
+├── standards/
+│   ├── <span class="created">knowledge-base.md</span>
+│   └── <span class="created">architecture.md</span>
+├── requirements/
+│   ├── <span class="created">index.md</span>
+│   └── features/
+│       ├── <span class="created">password-reset-request.md</span>
+│       └── <span class="created">password-reset-confirmation.md</span>
+├── context/
+│   └── <span class="created">password-reset.md</span> <span class="note">← enriched across 3 stages</span>
+├── learnings/
+│   └── <span class="created">review-insights.md</span> <span class="note">← "check rate limiting on request endpoints"</span>
+│                            <span class="note">   "wrap multi-write in transactions"</span>
+└── reviews/
+    └── <span class="created">review-log.md</span></div></div>
+    </div>
+
+    <div class="hoodie" onclick="toggleHoodie(this)">
+      <div class="hoodie-header"><span class="hoodie-chevron">&#9654;</span> The compounding effect</div>
+      <div class="hoodie-body">Next time you run /code-forge for a different feature, it loads those two insights. The AI proactively checks for rate limiting and transaction wrapping before generating — not because it was told, but because <b>review caught it once and the living context layer preserved it</b>. After 5-6 cycles, .lattice/learnings/ accumulates project-specific patterns. Atoms apply <i>your team's</i> rules, informed by <i>your</i> review history. The base framework never changes — the context layer makes it smarter.</div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+function toggle(header) {
+  const stage = header.parentElement;
+  stage.classList.toggle('open');
+  updateNav();
+}
+
+function toggleHoodie(el) {
+  el.classList.toggle('open');
+}
+
+function goStage(n) {
+  const stages = document.querySelectorAll('.stage');
+  stages[n].classList.toggle('open');
+  stages[n].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  updateNav();
+}
+
+function toggleAll(open) {
+  document.querySelectorAll('.stage').forEach(s => {
+    if (open) s.classList.add('open');
+    else s.classList.remove('open');
+  });
+  document.querySelectorAll('.hoodie').forEach(h => {
+    if (open) h.classList.add('open');
+    else h.classList.remove('open');
+  });
+  updateNav();
+}
+
+function updateNav() {
+  const stages = document.querySelectorAll('.stage');
+  const steps = document.querySelectorAll('.pipeline-step');
+  steps.forEach((step, i) => {
+    if (stages[i] && stages[i].classList.contains('open')) {
+      step.classList.add('active');
+    } else {
+      step.classList.remove('active');
+    }
+  });
+}
+</script>
+
+</body>
+</html>
