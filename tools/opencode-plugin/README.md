@@ -1,4 +1,4 @@
-# opencode-lattice
+# @apnea/opencode-lattice
 
 Lattice skill framework plugin for [opencode](https://opencode.ai).
 
@@ -6,7 +6,7 @@ Provides two capabilities:
 
 1. **Server plugin** — resolves `` `framework:xxx` `` references in Lattice skill commands, inlining referenced skill content before the AI sees it. This is the mechanical equivalent of Claude Code's `framework:` resolution.
 
-2. **TUI plugin** — registers all installed Lattice skills as slash commands in the autocomplete dropdown. Type `/` in a session to see skills like `/lattice-init`, `/code-forge`, `/review`, etc.
+2. **TUI plugin** — registers all installed Lattice skills as slash commands in the autocomplete dropdown. Type `/` in a session to see skills like `/lattice-init`, `/code-forge`, `/review`, etc. Slash commands work both inside an active session and from the home screen (a new session is created automatically).
 
 ## Install
 
@@ -14,7 +14,7 @@ First, install the Lattice skills:
 
 ```bash
 # Clone Lattice
-git clone https://github.com/nichochar/lattice.git
+git clone https://github.com/apnea/lattice.git
 
 # Install skills globally for opencode
 ./lattice/tools/install.sh ~/.config/opencode/skills/lattice
@@ -23,14 +23,18 @@ git clone https://github.com/nichochar/lattice.git
 Then install this plugin:
 
 ```bash
-opencode plugin opencode-lattice
+opencode plugin install @apnea/opencode-lattice
 ```
 
 Or install from a local checkout:
 
 ```bash
-opencode plugin /path/to/lattice/tools/opencode-plugin
+opencode plugin install /path/to/lattice/tools/opencode-plugin
 ```
+
+## Compatibility
+
+The package declares `engines.opencode` in `package.json` for version compatibility checks. The plugin requires opencode >= 1.0.0.
 
 ## How it works
 
@@ -40,7 +44,12 @@ Lattice skills reference other skills using `` `framework:skill-name` `` syntax.
 
 ### Slash commands (TUI)
 
-The TUI plugin discovers all installed skills at startup and registers each as a keymap command with a `slashName`. When selected from the autocomplete dropdown, it calls the opencode session command API to execute the skill.
+The TUI plugin discovers all installed skills at startup and registers each as a keymap command with a `slashName`. When selected from the autocomplete dropdown:
+
+- **In an active session** — sends the command directly to the current session
+- **On the home screen** — creates a new session, navigates to it, then sends the command
+
+Errors are surfaced as toast notifications rather than failing silently.
 
 ### Skill search paths
 
@@ -58,8 +67,15 @@ First match wins; duplicate names are skipped.
 ## Development
 
 ```bash
-# Run tests (requires Lattice skills installed at /tmp/lattice-plugin-test/.agents/skills/)
 cd /path/to/lattice/tools/opencode-plugin
+
+# Build
+npm run build
+
+# Type check
+npm run typecheck
+
+# Run tests (requires Lattice skills installed at /tmp/lattice-plugin-test/.agents/skills/)
 node test.mjs
 ```
 
