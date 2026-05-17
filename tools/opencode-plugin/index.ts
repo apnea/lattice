@@ -47,9 +47,10 @@ async function resolveTemplate(
 // ── Plugin entry point ────────────────────────────────────────────────
 
 export default {
-  server: async function LatticePlugin(input) {
+  id: "opencode-lattice",
+  server: async function LatticePlugin(input: { directory: string }) {
     return {
-      "command.execute.before": async (cmd, output) => {
+      "command.execute.before": async (cmd: unknown, output: { parts: Array<{ type: string; text?: string; prompt?: string; [key: string]: unknown }> }) => {
         for (const part of output.parts) {
           if (part.type === "text" && typeof part.text === "string") {
             if (!part.text.includes("framework:")) continue

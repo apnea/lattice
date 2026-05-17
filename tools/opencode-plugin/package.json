@@ -1,20 +1,40 @@
 {
-  "name": "opencode-lattice",
-  "version": "1.0.0",
+  "name": "@apnea/opencode-lattice",
+  "version": "1.1.0",
   "type": "module",
   "description": "Lattice skill framework plugin for opencode — resolves framework:xxx references and registers slash commands",
   "author": "Lattice",
   "license": "MIT",
-  "main": "./index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "./server": "./index.ts",
-    "./tui": "./tui.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tui": {
+      "types": "./dist/tui.d.ts",
+      "import": "./dist/tui.js"
+    },
+    "./skills": {
+      "types": "./dist/skills.d.ts",
+      "import": "./dist/skills.js"
+    }
   },
   "files": [
-    "index.ts",
-    "tui.ts",
-    "skills.ts"
+    "dist"
   ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build",
+    "test": "node test.mjs"
+  },
   "keywords": [
     "opencode",
     "opencode-plugin",
@@ -23,12 +43,17 @@
     "ai",
     "coding"
   ],
-  "opencode": {
-    "requires": ">=1.0.0"
+  "engines": {
+    "opencode": ">=1.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.1.0",
+    "typescript": "^5.9.3",
+    "@types/node": "^25.5.2"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nichochar/lattice.git",
+    "url": "git+https://github.com/nichochar/lattice.git",
     "directory": "tools/opencode-plugin"
   },
   "bugs": {

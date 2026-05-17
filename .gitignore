@@ -22,8 +22,12 @@ Thumbs.db
 # Node (if any tooling is added)
 node_modules/
 
+# Build output
+tools/opencode-plugin/dist/
+
 # Local environment
 *.local
 .env
 
 .opencode
+opencode
