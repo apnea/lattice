@@ -1,12 +1,11 @@
-# Lattice
+# Lattice for OpenCode
 
-<p align="center">
-  <img src="docs/image/logo.png" alt="lattice" width="500" height="500">
-</p>
+This is a plugin for [OpenCode](https://opencode.ai) to use the [Lattice](https://github.com/apnea/lattice) framework.
 
 Composable AI skills that teach assistants structured thinking — design-first, context-aware, and architecture-guided.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![npm](https://img.shields.io/npm/v/@apnea/opencode-lattice.svg)](https://www.npmjs.com/package/@apnea/opencode-lattice)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-blue.svg)](https://claude.ai/marketplace)
 [![Cursor](https://img.shields.io/badge/Cursor-compatible-blue.svg)](https://cursor.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/techygarg/lattice/blob/main/CONTRIBUTING.md)
@@ -44,14 +43,25 @@ Skills form a delivery lifecycle: `requirement-forge` → `design-blueprint` →
 
 1. **Install Lattice** — choose the path that fits your setup:
 
-   **Option A — Claude Code plugin (also works in Cursor — reads Claude Code skills automatically)**
+   **Option A — OpenCode plugin (recommended for opencode users)**
+   ```bash
+   # Install Lattice skills globally
+   git clone https://github.com/apnea/lattice.git
+   ./lattice/tools/install.sh ~/.config/opencode/skills/lattice
+
+   # Install the plugin
+   opencode plugin install @apnea/opencode-lattice
+   ```
+   The plugin resolves `framework:xxx` references in skill commands and registers all Lattice skills as slash commands (`/lattice-init`, `/code-forge`, `/review`, etc.) in the autocomplete dropdown. Works both inside sessions and from the home screen. See [`tools/opencode-plugin/README.md`](tools/opencode-plugin/README.md) for details.
+
+   **Option B — Claude Code plugin (also works in Cursor — reads Claude Code skills automatically)**
    ```
    /plugins marketplace add techygarg/lattice
    /plugins install lattice
    /reload-plugins
    ```
 
-   **Option B — Clone and install locally (any AI tool)**
+   **Option C — Clone and install locally (any AI tool)**
    ```bash
    git clone https://github.com/techygarg/lattice.git
    cd lattice

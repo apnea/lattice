@@ -1,6 +1,6 @@
 # @apnea/opencode-lattice
 
-Lattice skill framework plugin for [opencode](https://opencode.ai).
+Lattice skill framework plugin for [opencode](https://opencode.ai). See the [Lattice](https://github.com/apnea/lattice) repo for the full framework.
 
 Provides two capabilities:
 
