@@ -2,6 +2,28 @@
 
 This is a plugin for [OpenCode](https://opencode.ai) to use the [Lattice](https://github.com/apnea/lattice) framework.
 
+## Install
+
+First, install the Lattice skills:
+
+```bash
+# Clone Lattice
+git clone https://github.com/apnea/lattice.git
+
+# Install skills globally for opencode
+./lattice/tools/install.sh ~/.config/opencode/skills/lattice
+```
+
+Then install this plugin:
+
+```bash
+opencode plugin install @apnea/opencode-lattice
+```
+
+
+# Lattice
+
+
 Composable AI skills that teach assistants structured thinking — design-first, context-aware, and architecture-guided.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
